@@ -1,0 +1,12 @@
+{
+    "spellright.language": [
+        "DE_DE",
+        "EN_US"
+    ],
+    "spellright.documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext"
+    ],
+    "dart.flutterSdkPath": "/home/omni/repos/flutter_web/flutter"
+}
