@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 ///
 /// [condition]: the condition depending on which the subtree [child] is wrapped with the parent.
 /// [child]: The subtree that should always be build.
-/// [conditionalParentBuilder]: builds the parent with the subtree [child].
+/// [parentBuilder]: builds the parent with the subtree [child] if [condition] is true.
 ///
 /// ___________
 /// Usage:
@@ -16,7 +16,7 @@ import 'package:flutter/widgets.dart';
 ///       child: Widget3(),
 ///     ),
 ///   ),
-///   conditionalParentBuilder: (Widget child) => SomeParentWidget(child: child),
+///   parentBuilder: (Widget child) => SomeParentWidget(child: child),
 ///);
 /// ```
 ///
@@ -37,15 +37,24 @@ class ConditionalParentWidget extends StatelessWidget {
     Key? key,
     required this.condition,
     required this.child,
-    required this.conditionalParentBuilder,
+    required this.parentBuilder,
   }) : super(key: key);
 
+  /// The [child] which should be conditionally wrapped by the parent.
+  ///
+  /// If [condition] is false, this Widget will be returned directly.
+  /// If [condition] is true, this Widget will be passed to [parentBuilder] which will be returned.
   final Widget child;
+
+  /// The [condition] which controls whether the [child] is returned directly or passed to [parentBuilder].
   final bool condition;
-  final Widget Function(Widget child) conditionalParentBuilder;
+
+  /// The [parentBuilder] will be called only when [condition] is true.
+  /// Its [child] parameter is the [child] passed to [ConditionalParentWidget].
+  final Widget Function(Widget child) parentBuilder;
 
   @override
   Widget build(BuildContext context) {
-    return condition ? this.conditionalParentBuilder(this.child) : this.child;
+    return condition ? this.parentBuilder(this.child) : this.child;
   }
 }
