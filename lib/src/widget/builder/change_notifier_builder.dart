@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+/// Use this if you have a change notifier and want to rebuild on a change.
 class ChangeNotifierBuilder<E extends ChangeNotifier> extends StatefulWidget {
   ChangeNotifierBuilder({
     required this.notifier,
