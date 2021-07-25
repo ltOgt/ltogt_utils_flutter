@@ -15,6 +15,8 @@ class WidgetListGenerator {
     return ListGenerator.seperated(
       list: widgets,
       builder: (Widget w, i) => w,
+      leadingSeperator: beforeFirst,
+      trailingSeperator: afterLast,
       seperator: SizedBox(
         width: uniform ?? width,
         height: uniform ?? height,
