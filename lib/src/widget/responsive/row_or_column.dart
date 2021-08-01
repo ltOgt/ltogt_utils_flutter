@@ -11,6 +11,8 @@ class RowOrColumn extends StatelessWidget {
     this.textBaseline,
     this.textDirection,
     this.verticalDirection = VerticalDirection.down,
+    this.leading,
+    this.trailing,
   });
 
   final Axis axis;
@@ -21,12 +23,20 @@ class RowOrColumn extends StatelessWidget {
   final TextBaseline? textBaseline;
   final TextDirection? textDirection;
   final VerticalDirection verticalDirection;
+  final Widget? leading;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> _children = [
+      if (leading != null) leading!,
+      ...children,
+      if (trailing != null) trailing!,
+    ];
+
     return axis == Axis.vertical
         ? Column(
-            children: children,
+            children: _children,
             mainAxisAlignment: mainAxisAlignment,
             crossAxisAlignment: crossAxisAlignment,
             mainAxisSize: mainAxisSize,
@@ -35,7 +45,7 @@ class RowOrColumn extends StatelessWidget {
             verticalDirection: verticalDirection,
           )
         : Row(
-            children: children,
+            children: _children,
             mainAxisAlignment: mainAxisAlignment,
             crossAxisAlignment: crossAxisAlignment,
             mainAxisSize: mainAxisSize,
