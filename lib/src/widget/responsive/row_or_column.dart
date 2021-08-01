@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 class RowOrColumn extends StatelessWidget {
   const RowOrColumn({
     required this.axis,
-    required this.children,
+    this.children,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.crossAxisAlignment = CrossAxisAlignment.center,
     this.mainAxisSize = MainAxisSize.max,
@@ -13,24 +13,40 @@ class RowOrColumn extends StatelessWidget {
     this.verticalDirection = VerticalDirection.down,
     this.leading,
     this.trailing,
-  });
+    this.child,
+  })  : assert(
+          children != null || child != null,
+          "Main Content required",
+        ),
+        assert(
+          child == null || children == null,
+          "Use child only as replacement for children",
+        );
 
   final Axis axis;
-  final List<Widget> children;
+  final List<Widget>? children;
   final MainAxisAlignment mainAxisAlignment;
   final CrossAxisAlignment crossAxisAlignment;
   final MainAxisSize mainAxisSize;
   final TextBaseline? textBaseline;
   final TextDirection? textDirection;
   final VerticalDirection verticalDirection;
+
+  /// Put before [children] (or [child])
   final Widget? leading;
+
+  /// Put after [children] (or [child])
   final Widget? trailing;
+
+  /// Replacement for [children].
+  /// Mainly useful if [leading] and [trailing] are non null, and only on "child" exists.
+  final Widget? child;
 
   @override
   Widget build(BuildContext context) {
     List<Widget> _children = [
       if (leading != null) leading!,
-      ...children,
+      if (children != null) ...children! else child!,
       if (trailing != null) trailing!,
     ];
 
