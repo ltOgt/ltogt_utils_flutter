@@ -12,3 +12,5 @@ export 'src/widget/post_frame/post_frame_builder.dart';
 export 'src/widget/responsive/row_or_column.dart';
 
 export 'src/state/model/stateful_model.dart';
+
+export 'src/widget/size_helper.dart';
