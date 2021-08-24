@@ -17,3 +17,5 @@ export 'src/state/model/stateful_model.dart';
 export 'src/widget/size_helper.dart';
 
 export 'package:ltogt_utils/ltogt_utils.dart';
+
+export 'src/device/device_type.dart';
