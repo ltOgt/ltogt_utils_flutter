@@ -19,3 +19,5 @@ export 'src/widget/size_helper.dart';
 export 'package:ltogt_utils/ltogt_utils.dart';
 
 export 'src/device/device_type.dart';
+
+export 'src/widget/paint/line_widget.dart';
