@@ -1,3 +1,4 @@
+import 'package:example/example/cached_builder.dart';
 import 'package:example/example/line_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
@@ -7,6 +8,7 @@ import 'example/disposable_state.dart';
 const Map<String, Widget> examplesNameWidget = {
   "DisposableStateExample": DisposableStateExample(),
   "LineWidgetExample": LineWidgetExample(),
+  "CachedBuilderExample": CachedBuilderExample(),
 };
 
 void main() {

@@ -23,3 +23,5 @@ export 'src/device/device_type.dart';
 export 'src/widget/paint/line_widget.dart';
 
 export 'src/widget/example/exampleLauncher.dart';
+
+export 'src/widget/builder/cached_builder.dart';
