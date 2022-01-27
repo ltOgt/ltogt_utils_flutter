@@ -37,18 +37,22 @@ class _CachedBuilderExampleState extends State<CachedBuilderExample> {
               CachedBuilder(
                 // : only rebuild every 5 increments
                 params: [(counter / 5).floor()],
-                builder: (ctx) => GestureDetector(
-                  onTap: () => setState(() {
-                    counter = 0;
-                  }),
-                  child: Container(
-                    width: 150,
-                    height: 150,
-                    color: Colors.blue,
-                    alignment: Alignment.center,
-                    child: Child(parentCounter: counter),
-                  ),
-                ),
+                builder: (ctx) {
+                  final size = MediaQuery.of(ctx).size;
+                  print("build");
+                  return GestureDetector(
+                    onTap: () => setState(() {
+                      counter = 0;
+                    }),
+                    child: Container(
+                      width: size.width / 3,
+                      height: size.height / 3,
+                      color: Colors.blue,
+                      alignment: Alignment.center,
+                      child: Child(parentCounter: counter),
+                    ),
+                  );
+                },
               ),
             ],
           ),

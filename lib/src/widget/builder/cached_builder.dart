@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 
 /// Caches the result of [builder] and returns the cached [Widget] in [build].
@@ -21,21 +21,24 @@ class CachedBuilder extends StatefulWidget {
 }
 
 class _CachedBuilderState extends State<CachedBuilder> {
+  static const _dce = DeepCollectionEquality();
+
   late Widget _cache;
   _buildCache() => _cache = widget.builder(context);
 
   @override
-  void initState() {
-    super.initState();
-    _buildCache();
+  void didUpdateWidget(covariant CachedBuilder oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_dce.equals(widget.params, oldWidget.params)) {
+      _buildCache();
+    }
   }
 
   @override
-  void didUpdateWidget(covariant CachedBuilder oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (!listEquals(widget.params, oldWidget.params)) {
-      _buildCache();
-    }
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Also called right after initState => no need for initState
+    _buildCache();
   }
 
   @override
