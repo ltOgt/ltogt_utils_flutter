@@ -1,3 +1,4 @@
+import 'package:example/example/auto_size_text.dart';
 import 'package:example/example/cached_builder.dart';
 import 'package:example/example/line_widget.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ const Map<String, Widget> examplesNameWidget = {
   "DisposableStateExample": DisposableStateExample(),
   "LineWidgetExample": LineWidgetExample(),
   "CachedBuilderExample": CachedBuilderExample(),
+  "AutoSizeTextExample": AutoSizeTextExample(),
 };
 
 void main() {

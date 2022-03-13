@@ -25,3 +25,5 @@ export 'src/widget/paint/line_widget.dart';
 export 'src/widget/example/exampleLauncher.dart';
 
 export 'src/widget/builder/cached_builder.dart';
+
+export 'src/widget/text/auto_size_text.dart';
