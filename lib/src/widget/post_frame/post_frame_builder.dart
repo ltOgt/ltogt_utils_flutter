@@ -26,7 +26,7 @@ class _PostFrameBuilderState extends State<PostFrameBuilder> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       Size? size = RenderHelper.getSize(globalKey: widget.childKey);
       Offset? offset = RenderHelper.getPosition(globalKey: widget.childKey);
 
