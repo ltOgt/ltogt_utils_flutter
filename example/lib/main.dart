@@ -1,5 +1,6 @@
 import 'package:example/example/auto_size_text.dart';
 import 'package:example/example/cached_builder.dart';
+import 'package:example/example/file_tree_example.dart';
 import 'package:example/example/line_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
@@ -11,6 +12,7 @@ const Map<String, Widget> examplesNameWidget = {
   "LineWidgetExample": LineWidgetExample(),
   "CachedBuilderExample": CachedBuilderExample(),
   "AutoSizeTextExample": AutoSizeTextExample(),
+  "FileTreeExample": FileTreeExample(),
 };
 
 void main() {
