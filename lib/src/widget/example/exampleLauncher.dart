@@ -23,11 +23,13 @@ class ExampleLauncher extends StatelessWidget {
               child: Material(
                 color: Colors.black,
                 child: InkWell(
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      builder: (BuildContext context) => example.value,
-                    ),
-                  ),
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        builder: (_) {
+                          return Expanded(child: example.value);
+                        });
+                  },
                   child: SizedBox(
                     width: 300,
                     height: 50,

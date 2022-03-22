@@ -11,6 +11,8 @@ class FileTreeWidget extends StatelessWidget {
     this.childHeight = 20,
     this.iconWidth = 14,
     this.iconSpace = 4,
+    this.iconPadding = const EdgeInsets.symmetric(vertical: 2),
+    this.childPadding = const EdgeInsets.symmetric(vertical: 2),
   }) : super(key: key);
 
   final FileTree fileTree;
@@ -20,6 +22,8 @@ class FileTreeWidget extends StatelessWidget {
   final double childHeight;
   final double iconWidth;
   final double iconSpace;
+  final EdgeInsets iconPadding;
+  final EdgeInsets childPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +37,8 @@ class FileTreeWidget extends StatelessWidget {
       depth: 0,
       iconSpace: iconSpace,
       iconWidth: iconWidth,
+      iconPadding: iconPadding,
+      childPadding: childPadding,
     );
   }
 }
@@ -49,6 +55,8 @@ class FileTreeDirStructureWidget extends StatefulWidget {
     required this.depth,
     required this.iconWidth,
     required this.iconSpace,
+    required this.iconPadding,
+    required this.childPadding,
   }) : super(key: key);
 
   final FileTreeDir fileTreeDir;
@@ -60,6 +68,8 @@ class FileTreeDirStructureWidget extends StatefulWidget {
   final int depth;
   final double iconWidth;
   final double iconSpace;
+  final EdgeInsets iconPadding;
+  final EdgeInsets childPadding;
 
   @override
   _FileTreeDirStructureWidgetState createState() => _FileTreeDirStructureWidgetState();
@@ -87,6 +97,8 @@ class _FileTreeDirStructureWidgetState extends State<FileTreeDirStructureWidget>
             childInsetLeft: widget.childInsetLeft,
             iconSpace: widget.iconSpace,
             iconWidth: widget.iconWidth,
+            iconPadding: widget.iconPadding,
+            childPadding: widget.childPadding,
           ),
         ),
         // Child Dirs and Files
@@ -106,6 +118,8 @@ class _FileTreeDirStructureWidgetState extends State<FileTreeDirStructureWidget>
                   depth: widget.depth + 1,
                   iconSpace: widget.iconSpace,
                   iconWidth: widget.iconWidth,
+                  iconPadding: widget.iconPadding,
+                  childPadding: widget.childPadding,
                 ),
               ),
               // Files
@@ -120,6 +134,8 @@ class _FileTreeDirStructureWidgetState extends State<FileTreeDirStructureWidget>
                   childInsetLeft: widget.childInsetLeft,
                   iconSpace: widget.iconSpace,
                   iconWidth: widget.iconWidth,
+                  iconPadding: widget.iconPadding,
+                  childPadding: widget.childPadding,
                 ),
               ),
             ],
@@ -139,6 +155,8 @@ class FileTreeDirWidget extends StatelessWidget {
     required this.depth,
     required this.iconWidth,
     required this.iconSpace,
+    required this.iconPadding,
+    required this.childPadding,
   }) : super(key: key);
 
   final FileTreeDir fileTreeDir;
@@ -148,6 +166,8 @@ class FileTreeDirWidget extends StatelessWidget {
   final int depth;
   final double iconWidth;
   final double iconSpace;
+  final EdgeInsets iconPadding;
+  final EdgeInsets childPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -167,10 +187,13 @@ class FileTreeDirWidget extends StatelessWidget {
           SizedBox(
             width: iconWidth,
             height: childHeight,
-            child: FittedBox(
-              fit: BoxFit.contain,
-              child: Icon(
-                isExpanded ? Icons.keyboard_arrow_down : Icons.chevron_right,
+            child: Padding(
+              padding: iconPadding,
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: Icon(
+                  isExpanded ? Icons.keyboard_arrow_down : Icons.chevron_right,
+                ),
               ),
             ),
           ),
@@ -178,9 +201,15 @@ class FileTreeDirWidget extends StatelessWidget {
             width: iconSpace,
           ),
           Flexible(
-            child: Text(
-              fileTreeDir.name,
-              overflow: TextOverflow.ellipsis,
+            child: Padding(
+              padding: childPadding,
+              child: FittedBox(
+                fit: BoxFit.fitHeight,
+                child: Text(
+                  fileTreeDir.name,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ),
           ),
         ],
@@ -200,6 +229,8 @@ class FileTreeFileWidget extends StatelessWidget {
     required this.depth,
     required this.iconWidth,
     required this.iconSpace,
+    required this.iconPadding,
+    required this.childPadding,
   }) : super(key: key);
 
   final FileTreeFile fileTreeFile;
@@ -210,6 +241,8 @@ class FileTreeFileWidget extends StatelessWidget {
   final int depth;
   final double iconWidth;
   final double iconSpace;
+  final EdgeInsets iconPadding;
+  final EdgeInsets childPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -232,18 +265,27 @@ class FileTreeFileWidget extends StatelessWidget {
             SizedBox(
               width: iconWidth,
               height: childHeight,
-              child: FittedBox(
-                fit: BoxFit.contain,
-                child: Icon(Icons.text_snippet_outlined),
+              child: Padding(
+                padding: iconPadding,
+                child: FittedBox(
+                  fit: BoxFit.contain,
+                  child: Icon(Icons.text_snippet_outlined),
+                ),
               ),
             ),
             SizedBox(
               width: iconSpace,
             ),
             Flexible(
-              child: Text(
-                fileTreeFile.name,
-                overflow: TextOverflow.ellipsis,
+              child: Padding(
+                padding: childPadding,
+                child: FittedBox(
+                  fit: BoxFit.fitHeight,
+                  child: Text(
+                    fileTreeFile.name,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ),
             ),
           ],

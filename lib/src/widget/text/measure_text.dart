@@ -10,7 +10,11 @@ class TextSizeUtil {
     double maxWidth = double.infinity,
     TextPainter Function(TextSpan textSpan)? customPainter,
   }) {
-    final painter = (customPainter?.call(textSpan) ?? TextPainter(text: textSpan))
+    final painter = (customPainter?.call(textSpan) ??
+        TextPainter(
+          text: textSpan,
+          textDirection: TextDirection.ltr,
+        ))
       ..layout(
         minWidth: minWidth,
         maxWidth: maxWidth,
