@@ -4,6 +4,7 @@ export 'src/widget/builder/conditional_parent_widget.dart';
 export 'src/widget/builder/change_notifier_builder.dart';
 export 'src/widget/builder/widget_list_generator.dart';
 export 'src/widget/builder/small_state.dart';
+export 'src/widget/builder/hover_builder.dart';
 
 export 'src/widget/future/future_switch.dart';
 
