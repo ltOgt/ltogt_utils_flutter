@@ -1,6 +1,126 @@
 import 'package:flutter/material.dart';
 import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
 
+/// Style for a row inside [FileTreeWidget].
+class FileTreeEntryStyle {
+  /// Background color across the entire row.
+  final Color? colorBg;
+
+  /// TextStyle of the rows text.
+  final TextStyle? textStyle;
+
+  /// Hover color across the entries row.
+  final Color? hoverColor;
+
+  /// Color for all scope indicator lines across the entire row.
+  final Color? scopeIndicatorColor;
+
+  /// Color for the rows icon
+  final Color? iconColor;
+
+  const FileTreeEntryStyle({
+    this.colorBg,
+    this.textStyle,
+    this.hoverColor,
+    this.scopeIndicatorColor,
+    this.iconColor,
+  });
+}
+
+class FileTreeWidgetStyle {
+  /// The space that each rows content is moved right in relation to its parent
+  final double childInsetLeft;
+
+  /// The height of each row
+  final double rowHeight;
+
+  /// The width to which file and directory icons are [BoxFit.contain]ed in combination with [rowHeight].
+  final double iconWidth;
+
+  /// The space between the file/directory-icon and the file/directory-name
+  final double iconToTextGapWidth;
+
+  /// Additional padding applied around the icon inside of [iconWidth] and [rowHeight].
+  final EdgeInsets iconPadding;
+
+  /// Additional padding applied around file/directory-name inside [rowHeight]
+  final EdgeInsets textPadding;
+
+  // --------------------------------------------------------------------------- File Style
+
+  /// Style for [FileTreeWidget.openFiles]
+  final FileTreeEntryStyle openFileRowStyle;
+
+  /// Style for non [FileTreeWidget.openFiles].
+  ///
+  /// Its values are also used as fallback for `null` values inside [openFileRowStyle].
+  final FileTreeEntryStyle fileRowStyle;
+
+  // --------------------------------------------------------------------------- Directory Style
+  /// Style for [FileTreeWidget.openFiles]
+  final FileTreeEntryStyle expandedDirectoryRowStyle;
+
+  /// Style for non [FileTreeWidget.openFiles].
+  ///
+  /// Its values are also used as fallback for `null` values inside [expandedDirectoryRowStyle].
+  final FileTreeEntryStyle directoryRowStyle;
+
+  const FileTreeWidgetStyle({
+    this.childInsetLeft = 14,
+    this.rowHeight = 20,
+    this.iconWidth = 14,
+    this.iconToTextGapWidth = 4,
+    this.iconPadding = const EdgeInsets.symmetric(vertical: 2),
+    this.textPadding = const EdgeInsets.symmetric(vertical: 2),
+    this.openFileRowStyle = const FileTreeEntryStyle(),
+    this.fileRowStyle = const FileTreeEntryStyle(),
+    this.expandedDirectoryRowStyle = const FileTreeEntryStyle(),
+    this.directoryRowStyle = const FileTreeEntryStyle(),
+  });
+
+  // --------------------------------------------------------------------------- Resolve actual style to be used
+  // ........................................................................... background
+  Color _resolveBgColor(bool isOpen, FileTreeEntryStyle active, FileTreeEntryStyle inactive) => (isOpen) //
+      ? active.colorBg ?? inactive.colorBg ?? Colors.transparent
+      : inactive.colorBg ?? Colors.transparent;
+
+  Color resolveFileColorBg(bool isOpen) => _resolveBgColor(isOpen, openFileRowStyle, fileRowStyle);
+  Color resolveDirColorBg(bool isOpen) => _resolveBgColor(isOpen, expandedDirectoryRowStyle, directoryRowStyle);
+
+  // ........................................................................... text
+  TextStyle? _resolveTextStyle(bool isOpen, FileTreeEntryStyle active, FileTreeEntryStyle inactive) => (isOpen) //
+      ? active.textStyle ?? inactive.textStyle
+      : inactive.textStyle;
+
+  TextStyle? resolveFileTextStyle(bool isOpen) => _resolveTextStyle(isOpen, openFileRowStyle, fileRowStyle);
+  TextStyle? resolveDirTextStyle(bool isOpen) =>
+      _resolveTextStyle(isOpen, expandedDirectoryRowStyle, directoryRowStyle);
+
+  // ........................................................................... hover
+  Color? _resolveHoverColor(bool isOpen, FileTreeEntryStyle active, FileTreeEntryStyle inactive) => (isOpen) //
+      ? active.hoverColor ?? inactive.hoverColor
+      : inactive.hoverColor;
+
+  Color? resolveFileHoverColor(bool isOpen) => _resolveHoverColor(isOpen, openFileRowStyle, fileRowStyle);
+  Color? resolveDirHoverColor(bool isOpen) => _resolveHoverColor(isOpen, expandedDirectoryRowStyle, directoryRowStyle);
+
+  // ........................................................................... scope color
+  Color _resolveScopeColor(bool isOpen, FileTreeEntryStyle active, FileTreeEntryStyle inactive) => (isOpen) //
+      ? active.scopeIndicatorColor ?? inactive.scopeIndicatorColor ?? Colors.black
+      : inactive.scopeIndicatorColor ?? Colors.black;
+
+  Color resolveFileScopeColor(bool isOpen) => _resolveScopeColor(isOpen, openFileRowStyle, fileRowStyle);
+  Color resolveDirScopeColor(bool isOpen) => _resolveScopeColor(isOpen, expandedDirectoryRowStyle, directoryRowStyle);
+
+  // ........................................................................... icon color
+  Color? _resolveIconColor(bool isOpen, FileTreeEntryStyle active, FileTreeEntryStyle inactive) => (isOpen) //
+      ? active.iconColor ?? inactive.iconColor
+      : inactive.iconColor;
+
+  Color? resolveFileIconColor(bool isOpen) => _resolveIconColor(isOpen, openFileRowStyle, fileRowStyle);
+  Color? resolveDirIconColor(bool isOpen) => _resolveIconColor(isOpen, expandedDirectoryRowStyle, directoryRowStyle);
+}
+
 class FileTreeWidget extends StatelessWidget {
   const FileTreeWidget({
     Key? key,
@@ -8,22 +128,15 @@ class FileTreeWidget extends StatelessWidget {
     required this.onOpenFile,
     required this.expandedDirectories,
     required this.onToggleDirExpansion,
-    this.childInsetLeft = 14,
-    this.childHeight = 20,
-    this.iconWidth = 14,
-    this.iconSpace = 4,
-    this.iconPadding = const EdgeInsets.symmetric(vertical: 2),
-    this.childPadding = const EdgeInsets.symmetric(vertical: 2),
+    this.openFiles = const {},
+    this.style = const FileTreeWidgetStyle(),
   }) : super(key: key);
 
   final FileTree fileTree;
   final void Function(FileTreePath) onOpenFile;
-  final double childInsetLeft;
-  final double childHeight;
-  final double iconWidth;
-  final double iconSpace;
-  final EdgeInsets iconPadding;
-  final EdgeInsets childPadding;
+
+  /// Used to highlight open files
+  final Set<FileTreePath> openFiles;
 
   /// All [FileTreeDir]s pointed to by the [FileTreePath] inside this set will be expanded,
   /// all others will be collapsed.
@@ -36,6 +149,8 @@ class FileTreeWidget extends StatelessWidget {
   /// The caller of this widget must update [expandedDirectories] accordingly.
   final void Function(FileTreePath path, bool expanded) onToggleDirExpansion;
 
+  final FileTreeWidgetStyle style;
+
   @override
   Widget build(BuildContext context) {
     return FileTreeDirStructureWidget(
@@ -44,13 +159,9 @@ class FileTreeWidget extends StatelessWidget {
       onOpenFile: onOpenFile,
       expandedDirectories: expandedDirectories,
       onToggleDirExpansion: onToggleDirExpansion,
-      childInsetLeft: childInsetLeft,
-      childHeight: childHeight,
       depth: 0,
-      iconSpace: iconSpace,
-      iconWidth: iconWidth,
-      iconPadding: iconPadding,
-      childPadding: childPadding,
+      openFiles: openFiles,
+      style: style,
     );
   }
 }
@@ -63,13 +174,9 @@ class FileTreeDirStructureWidget extends StatelessWidget {
     required this.expandedDirectories,
     required this.onToggleDirExpansion,
     required this.onOpenFile,
-    required this.childInsetLeft,
-    required this.childHeight,
     required this.depth,
-    required this.iconWidth,
-    required this.iconSpace,
-    required this.iconPadding,
-    required this.childPadding,
+    required this.openFiles,
+    required this.style,
   }) : super(key: key);
 
   final FileTreeDir fileTreeDir;
@@ -77,13 +184,10 @@ class FileTreeDirStructureWidget extends StatelessWidget {
   final void Function(FileTreePath) onOpenFile;
   final Set<FileTreePath> expandedDirectories;
   final void Function(FileTreePath path, bool expanded) onToggleDirExpansion;
-  final double childInsetLeft;
-  final double childHeight;
+
   final int depth;
-  final double iconWidth;
-  final double iconSpace;
-  final EdgeInsets iconPadding;
-  final EdgeInsets childPadding;
+  final Set<FileTreePath> openFiles;
+  final FileTreeWidgetStyle style;
 
   @override
   Widget build(BuildContext context) {
@@ -95,19 +199,12 @@ class FileTreeDirStructureWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // This dir
-        InkWell(
+        FileTreeDirWidget(
           onTap: () => onToggleDirExpansion(dirPath, !expanded),
-          child: FileTreeDirWidget(
-            fileTreeDir: fileTreeDir,
-            isExpanded: expanded,
-            childHeight: childHeight,
-            depth: depth,
-            childInsetLeft: childInsetLeft,
-            iconSpace: iconSpace,
-            iconWidth: iconWidth,
-            iconPadding: iconPadding,
-            childPadding: childPadding,
-          ),
+          fileTreeDir: fileTreeDir,
+          isExpanded: expanded,
+          depth: depth,
+          style: style,
         ),
         // Child Dirs and Files
         if (expanded)
@@ -122,13 +219,9 @@ class FileTreeDirStructureWidget extends StatelessWidget {
                   expandedDirectories: expandedDirectories,
                   onToggleDirExpansion: onToggleDirExpansion,
                   onOpenFile: onOpenFile,
-                  childInsetLeft: childInsetLeft,
-                  childHeight: childHeight,
                   depth: depth + 1,
-                  iconSpace: iconSpace,
-                  iconWidth: iconWidth,
-                  iconPadding: iconPadding,
-                  childPadding: childPadding,
+                  openFiles: openFiles,
+                  style: style,
                 ),
               ),
               // Files
@@ -138,13 +231,9 @@ class FileTreeDirStructureWidget extends StatelessWidget {
                   parentPath: List.of(parentPath)..add(fileTreeDir.name),
                   fileTreeFile: fileTreeDir.files[index],
                   onOpen: onOpenFile,
-                  childHeight: childHeight,
                   depth: depth + 1,
-                  childInsetLeft: childInsetLeft,
-                  iconSpace: iconSpace,
-                  iconWidth: iconWidth,
-                  iconPadding: iconPadding,
-                  childPadding: childPadding,
+                  openFiles: openFiles,
+                  style: style,
                 ),
               ),
             ],
@@ -159,69 +248,72 @@ class FileTreeDirWidget extends StatelessWidget {
     Key? key,
     required this.fileTreeDir,
     required this.isExpanded,
-    required this.childHeight,
-    required this.childInsetLeft,
     required this.depth,
-    required this.iconWidth,
-    required this.iconSpace,
-    required this.iconPadding,
-    required this.childPadding,
+    required this.style,
+    required this.onTap,
   }) : super(key: key);
 
   final FileTreeDir fileTreeDir;
   final bool isExpanded;
-  final double childHeight;
-  final double childInsetLeft;
+
   final int depth;
-  final double iconWidth;
-  final double iconSpace;
-  final EdgeInsets iconPadding;
-  final EdgeInsets childPadding;
+  final FileTreeWidgetStyle style;
+
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: childHeight,
-      child: Row(
-        children: [
-          for (int i = 0; i < depth; i++) ...[
-            SizedBox(width: childInsetLeft / 2 - 1),
-            Container(
-              width: 1,
-              height: childHeight,
-              color: Colors.white,
-            ),
-            SizedBox(width: childInsetLeft / 2),
-          ],
-          SizedBox(
-            width: iconWidth,
-            height: childHeight,
-            child: Padding(
-              padding: iconPadding,
-              child: FittedBox(
-                fit: BoxFit.contain,
-                child: Icon(
-                  isExpanded ? Icons.keyboard_arrow_down : Icons.chevron_right,
+    return Material(
+      color: style.resolveDirColorBg(isExpanded),
+      child: InkWell(
+        onTap: onTap,
+        hoverColor: style.resolveDirHoverColor(isExpanded),
+        child: SizedBox(
+          height: style.rowHeight,
+          child: Row(
+            children: [
+              for (int i = 0; i < depth; i++) ...[
+                SizedBox(width: style.childInsetLeft / 2 - 1),
+                Container(
+                  width: 1,
+                  height: style.rowHeight,
+                  color: style.resolveDirScopeColor(isExpanded),
+                ),
+                SizedBox(width: style.childInsetLeft / 2),
+              ],
+              SizedBox(
+                width: style.iconWidth,
+                height: style.rowHeight,
+                child: Padding(
+                  padding: style.iconPadding,
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: Icon(
+                      isExpanded ? Icons.keyboard_arrow_down : Icons.chevron_right,
+                      color: style.resolveDirIconColor(isExpanded),
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          SizedBox(
-            width: iconSpace,
-          ),
-          Flexible(
-            child: Padding(
-              padding: childPadding,
-              child: FittedBox(
-                fit: BoxFit.fitHeight,
-                child: Text(
-                  fileTreeDir.name,
-                  overflow: TextOverflow.ellipsis,
+              SizedBox(
+                width: style.iconToTextGapWidth,
+              ),
+              Flexible(
+                child: Padding(
+                  padding: style.textPadding,
+                  child: FittedBox(
+                    fit: BoxFit.fitHeight,
+                    child: Text(
+                      fileTreeDir.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: style.resolveDirTextStyle(isExpanded),
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -233,71 +325,76 @@ class FileTreeFileWidget extends StatelessWidget {
     required this.fileTreeFile,
     required this.parentPath,
     required this.onOpen,
-    required this.childHeight,
-    required this.childInsetLeft,
     required this.depth,
-    required this.iconWidth,
-    required this.iconSpace,
-    required this.iconPadding,
-    required this.childPadding,
+    required this.openFiles,
+    required this.style,
   }) : super(key: key);
 
   final FileTreeFile fileTreeFile;
   final List<String> parentPath;
   final void Function(FileTreePath) onOpen;
-  final double childHeight;
-  final double childInsetLeft;
+
   final int depth;
-  final double iconWidth;
-  final double iconSpace;
-  final EdgeInsets iconPadding;
-  final EdgeInsets childPadding;
+
+  final Set<FileTreePath> openFiles;
+  final FileTreeWidgetStyle style;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => onOpen(FileTreePath([...parentPath, fileTreeFile.name])),
-      child: SizedBox(
-        height: childHeight,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            for (int i = 0; i < depth; i++) ...[
-              SizedBox(width: childInsetLeft / 2 - 1),
-              Container(
-                width: 1,
-                height: childHeight,
-                color: Colors.white,
-              ),
-              SizedBox(width: childInsetLeft / 2),
-            ],
-            SizedBox(
-              width: iconWidth,
-              height: childHeight,
-              child: Padding(
-                padding: iconPadding,
-                child: FittedBox(
-                  fit: BoxFit.contain,
-                  child: Icon(Icons.text_snippet_outlined),
+    final path = FileTreePath([...parentPath, fileTreeFile.name]);
+    final isOpen = openFiles.contains(path);
+
+    return Material(
+      color: style.resolveFileColorBg(isOpen),
+      child: InkWell(
+        onTap: () => onOpen(path),
+        hoverColor: style.resolveFileHoverColor(isOpen),
+        child: SizedBox(
+          height: style.rowHeight,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              for (int i = 0; i < depth; i++) ...[
+                SizedBox(width: style.childInsetLeft / 2 - 1),
+                Container(
+                  width: 1,
+                  height: style.rowHeight,
+                  color: style.resolveFileScopeColor(isOpen),
                 ),
-              ),
-            ),
-            SizedBox(
-              width: iconSpace,
-            ),
-            Flexible(
-              child: Padding(
-                padding: childPadding,
-                child: FittedBox(
-                  fit: BoxFit.fitHeight,
-                  child: Text(
-                    fileTreeFile.name,
-                    overflow: TextOverflow.ellipsis,
+                SizedBox(width: style.childInsetLeft / 2),
+              ],
+              SizedBox(
+                width: style.iconWidth,
+                height: style.rowHeight,
+                child: Padding(
+                  padding: style.iconPadding,
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: Icon(
+                      Icons.text_snippet_outlined,
+                      color: style.resolveFileIconColor(isOpen),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+              SizedBox(
+                width: style.iconToTextGapWidth,
+              ),
+              Flexible(
+                child: Padding(
+                  padding: style.textPadding,
+                  child: FittedBox(
+                    fit: BoxFit.fitHeight,
+                    child: Text(
+                      fileTreeFile.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: style.resolveFileTextStyle(isOpen),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

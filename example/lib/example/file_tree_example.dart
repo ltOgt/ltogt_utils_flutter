@@ -63,6 +63,7 @@ class TreeStateWidget extends StatefulWidget {
 
 class _TreeStateWidgetState extends State<TreeStateWidget> {
   Set<FileTreePath> expandedDirs = {};
+  Set<FileTreePath> openFiles = {};
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +78,24 @@ class _TreeStateWidgetState extends State<TreeStateWidget> {
         setState(() {});
       },
       fileTree: widget.fileTree,
-      onOpenFile: (file) {},
+      openFiles: openFiles,
+      onOpenFile: (file) {
+        if (openFiles.contains(file)) {
+          openFiles.remove(file);
+        } else {
+          openFiles.add(file);
+        }
+        setState(() {});
+      },
+      style: const FileTreeWidgetStyle(
+        openFileRowStyle: FileTreeEntryStyle(
+          colorBg: Colors.black,
+          hoverColor: Color(0x55FFFFFF),
+          iconColor: Colors.white,
+          textStyle: TextStyle(color: Colors.white),
+          scopeIndicatorColor: Colors.white,
+        ),
+      ),
     );
   }
 }
