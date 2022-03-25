@@ -6,7 +6,8 @@ class FileTreeWidget extends StatelessWidget {
     Key? key,
     required this.fileTree,
     required this.onOpenFile,
-    this.allExpanded = false,
+    required this.expandedDirectories,
+    required this.onToggleDirExpansion,
     this.childInsetLeft = 14,
     this.childHeight = 20,
     this.iconWidth = 14,
@@ -16,7 +17,6 @@ class FileTreeWidget extends StatelessWidget {
   }) : super(key: key);
 
   final FileTree fileTree;
-  final bool allExpanded;
   final void Function(FileTreePath) onOpenFile;
   final double childInsetLeft;
   final double childHeight;
@@ -25,13 +25,25 @@ class FileTreeWidget extends StatelessWidget {
   final EdgeInsets iconPadding;
   final EdgeInsets childPadding;
 
+  /// All [FileTreeDir]s pointed to by the [FileTreePath] inside this set will be expanded,
+  /// all others will be collapsed.
+  ///
+  /// Also see [onToggleDirExpansion].
+  final Set<FileTreePath> expandedDirectories;
+
+  /// Called when expansion / collapsing of a directory is requested by the user.
+  ///
+  /// The caller of this widget must update [expandedDirectories] accordingly.
+  final void Function(FileTreePath path, bool expanded) onToggleDirExpansion;
+
   @override
   Widget build(BuildContext context) {
     return FileTreeDirStructureWidget(
       fileTreeDir: fileTree.rootDir,
-      filePath: const [],
-      allExpanded: allExpanded,
+      parentPath: const [],
       onOpenFile: onOpenFile,
+      expandedDirectories: expandedDirectories,
+      onToggleDirExpansion: onToggleDirExpansion,
       childInsetLeft: childInsetLeft,
       childHeight: childHeight,
       depth: 0,
@@ -43,12 +55,13 @@ class FileTreeWidget extends StatelessWidget {
   }
 }
 
-class FileTreeDirStructureWidget extends StatefulWidget {
+class FileTreeDirStructureWidget extends StatelessWidget {
   const FileTreeDirStructureWidget({
     Key? key,
     required this.fileTreeDir,
-    required this.filePath,
-    this.allExpanded = false,
+    required this.parentPath,
+    required this.expandedDirectories,
+    required this.onToggleDirExpansion,
     required this.onOpenFile,
     required this.childInsetLeft,
     required this.childHeight,
@@ -60,9 +73,10 @@ class FileTreeDirStructureWidget extends StatefulWidget {
   }) : super(key: key);
 
   final FileTreeDir fileTreeDir;
-  final List<String> filePath;
-  final bool allExpanded;
+  final List<String> parentPath;
   final void Function(FileTreePath) onOpenFile;
+  final Set<FileTreePath> expandedDirectories;
+  final void Function(FileTreePath path, bool expanded) onToggleDirExpansion;
   final double childInsetLeft;
   final double childHeight;
   final int depth;
@@ -72,33 +86,27 @@ class FileTreeDirStructureWidget extends StatefulWidget {
   final EdgeInsets childPadding;
 
   @override
-  _FileTreeDirStructureWidgetState createState() => _FileTreeDirStructureWidgetState();
-}
-
-class _FileTreeDirStructureWidgetState extends State<FileTreeDirStructureWidget> {
-  late bool expanded = widget.allExpanded;
-
-  @override
   Widget build(BuildContext context) {
+    final dirPath = FileTreePath([...parentPath, fileTreeDir.name]);
+    bool expanded = expandedDirectories.contains(dirPath);
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // This dir
         InkWell(
-          onTap: () => setState(() {
-            expanded = !expanded;
-          }),
+          onTap: () => onToggleDirExpansion(dirPath, !expanded),
           child: FileTreeDirWidget(
-            fileTreeDir: widget.fileTreeDir,
+            fileTreeDir: fileTreeDir,
             isExpanded: expanded,
-            childHeight: widget.childHeight,
-            depth: widget.depth,
-            childInsetLeft: widget.childInsetLeft,
-            iconSpace: widget.iconSpace,
-            iconWidth: widget.iconWidth,
-            iconPadding: widget.iconPadding,
-            childPadding: widget.childPadding,
+            childHeight: childHeight,
+            depth: depth,
+            childInsetLeft: childInsetLeft,
+            iconSpace: iconSpace,
+            iconWidth: iconWidth,
+            iconPadding: iconPadding,
+            childPadding: childPadding,
           ),
         ),
         // Child Dirs and Files
@@ -107,35 +115,36 @@ class _FileTreeDirStructureWidgetState extends State<FileTreeDirStructureWidget>
             children: [
               // Dirs
               ...List.generate(
-                widget.fileTreeDir.dirs.length,
+                fileTreeDir.dirs.length,
                 (index) => FileTreeDirStructureWidget(
-                  fileTreeDir: widget.fileTreeDir.dirs[index],
-                  filePath: List.of(widget.filePath)..add(widget.fileTreeDir.name),
-                  allExpanded: widget.allExpanded,
-                  onOpenFile: widget.onOpenFile,
-                  childInsetLeft: widget.childInsetLeft,
-                  childHeight: widget.childHeight,
-                  depth: widget.depth + 1,
-                  iconSpace: widget.iconSpace,
-                  iconWidth: widget.iconWidth,
-                  iconPadding: widget.iconPadding,
-                  childPadding: widget.childPadding,
+                  fileTreeDir: fileTreeDir.dirs[index],
+                  parentPath: List.of(parentPath)..add(fileTreeDir.name),
+                  expandedDirectories: expandedDirectories,
+                  onToggleDirExpansion: onToggleDirExpansion,
+                  onOpenFile: onOpenFile,
+                  childInsetLeft: childInsetLeft,
+                  childHeight: childHeight,
+                  depth: depth + 1,
+                  iconSpace: iconSpace,
+                  iconWidth: iconWidth,
+                  iconPadding: iconPadding,
+                  childPadding: childPadding,
                 ),
               ),
               // Files
               ...List.generate(
-                widget.fileTreeDir.files.length,
+                fileTreeDir.files.length,
                 (index) => FileTreeFileWidget(
-                  filePath: List.of(widget.filePath)..add(widget.fileTreeDir.name),
-                  fileTreeFile: widget.fileTreeDir.files[index],
-                  onOpen: widget.onOpenFile,
-                  childHeight: widget.childHeight,
-                  depth: widget.depth + 1,
-                  childInsetLeft: widget.childInsetLeft,
-                  iconSpace: widget.iconSpace,
-                  iconWidth: widget.iconWidth,
-                  iconPadding: widget.iconPadding,
-                  childPadding: widget.childPadding,
+                  parentPath: List.of(parentPath)..add(fileTreeDir.name),
+                  fileTreeFile: fileTreeDir.files[index],
+                  onOpen: onOpenFile,
+                  childHeight: childHeight,
+                  depth: depth + 1,
+                  childInsetLeft: childInsetLeft,
+                  iconSpace: iconSpace,
+                  iconWidth: iconWidth,
+                  iconPadding: iconPadding,
+                  childPadding: childPadding,
                 ),
               ),
             ],
@@ -222,7 +231,7 @@ class FileTreeFileWidget extends StatelessWidget {
   const FileTreeFileWidget({
     Key? key,
     required this.fileTreeFile,
-    required this.filePath,
+    required this.parentPath,
     required this.onOpen,
     required this.childHeight,
     required this.childInsetLeft,
@@ -234,7 +243,7 @@ class FileTreeFileWidget extends StatelessWidget {
   }) : super(key: key);
 
   final FileTreeFile fileTreeFile;
-  final List<String> filePath;
+  final List<String> parentPath;
   final void Function(FileTreePath) onOpen;
   final double childHeight;
   final double childInsetLeft;
@@ -247,7 +256,7 @@ class FileTreeFileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => onOpen(FileTreePath([...filePath, fileTreeFile.name])),
+      onTap: () => onOpen(FileTreePath([...parentPath, fileTreeFile.name])),
       child: SizedBox(
         height: childHeight,
         child: Row(

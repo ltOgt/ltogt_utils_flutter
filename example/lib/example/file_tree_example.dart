@@ -39,16 +39,45 @@ class FileTreeExample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       title: 'FileTreeWidget example',
       home: Scaffold(
         backgroundColor: Colors.grey,
-        body: FileTreeWidget(
-          allExpanded: true,
-          fileTree: fileTree,
-          onOpenFile: (file) {},
-        ),
+        body: TreeStateWidget(fileTree: fileTree),
       ),
+    );
+  }
+}
+
+class TreeStateWidget extends StatefulWidget {
+  const TreeStateWidget({
+    Key? key,
+    required this.fileTree,
+  }) : super(key: key);
+
+  final FileTree fileTree;
+
+  @override
+  State<TreeStateWidget> createState() => _TreeStateWidgetState();
+}
+
+class _TreeStateWidgetState extends State<TreeStateWidget> {
+  Set<FileTreePath> expandedDirs = {};
+
+  @override
+  Widget build(BuildContext context) {
+    return FileTreeWidget(
+      expandedDirectories: expandedDirs,
+      onToggleDirExpansion: (path, expanded) {
+        if (expanded) {
+          expandedDirs.add(path);
+        } else {
+          expandedDirs.remove(path);
+        }
+        setState(() {});
+      },
+      fileTree: widget.fileTree,
+      onOpenFile: (file) {},
     );
   }
 }
