@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
 
+enum FileTreeSorting {
+  descending,
+  ascending,
+  none,
+}
+
 /// Style for a row inside [FileTreeWidget].
 class FileTreeEntryStyle {
   /// Background color across the entire row.
@@ -130,6 +136,7 @@ class FileTreeWidget extends StatelessWidget {
     required this.onToggleDirExpansion,
     this.openFiles = const {},
     this.style = const FileTreeWidgetStyle(),
+    this.sorting = FileTreeSorting.none,
   }) : super(key: key);
 
   final FileTree fileTree;
@@ -151,6 +158,8 @@ class FileTreeWidget extends StatelessWidget {
 
   final FileTreeWidgetStyle style;
 
+  final FileTreeSorting sorting;
+
   @override
   Widget build(BuildContext context) {
     return FileTreeDirStructureWidget(
@@ -162,6 +171,7 @@ class FileTreeWidget extends StatelessWidget {
       depth: 0,
       openFiles: openFiles,
       style: style,
+      sorting: sorting,
     );
   }
 }
@@ -177,6 +187,7 @@ class FileTreeDirStructureWidget extends StatelessWidget {
     required this.depth,
     required this.openFiles,
     required this.style,
+    required this.sorting,
   }) : super(key: key);
 
   final FileTreeDir fileTreeDir;
@@ -189,10 +200,32 @@ class FileTreeDirStructureWidget extends StatelessWidget {
   final Set<FileTreePath> openFiles;
   final FileTreeWidgetStyle style;
 
+  final FileTreeSorting sorting;
+
+  int _desc(FileTreeEntity a, FileTreeEntity b) => a.name.toLowerCase().compareTo(b.name.toLowerCase());
+  int _asc(FileTreeEntity a, FileTreeEntity b) => -1 * _desc(a, b);
+
   @override
   Widget build(BuildContext context) {
     final dirPath = FileTreePath([...parentPath, fileTreeDir.name]);
     bool expanded = expandedDirectories.contains(dirPath);
+
+    final dirs = [...fileTreeDir.dirs];
+    final files = [...fileTreeDir.files];
+    switch (sorting) {
+      case FileTreeSorting.descending:
+        dirs.sort(_desc);
+        files.sort(_desc);
+        break;
+      case FileTreeSorting.ascending:
+        dirs.sort(_asc);
+        files.sort(_asc);
+        break;
+      case FileTreeSorting.none:
+        break;
+    }
+
+    final path = [...parentPath, fileTreeDir.name];
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -212,24 +245,25 @@ class FileTreeDirStructureWidget extends StatelessWidget {
             children: [
               // Dirs
               ...List.generate(
-                fileTreeDir.dirs.length,
+                dirs.length,
                 (index) => FileTreeDirStructureWidget(
-                  fileTreeDir: fileTreeDir.dirs[index],
-                  parentPath: List.of(parentPath)..add(fileTreeDir.name),
+                  fileTreeDir: dirs[index],
+                  parentPath: path,
                   expandedDirectories: expandedDirectories,
                   onToggleDirExpansion: onToggleDirExpansion,
                   onOpenFile: onOpenFile,
                   depth: depth + 1,
                   openFiles: openFiles,
                   style: style,
+                  sorting: sorting,
                 ),
               ),
               // Files
               ...List.generate(
-                fileTreeDir.files.length,
+                files.length,
                 (index) => FileTreeFileWidget(
-                  parentPath: List.of(parentPath)..add(fileTreeDir.name),
-                  fileTreeFile: fileTreeDir.files[index],
+                  parentPath: path,
+                  fileTreeFile: files[index],
                   onOpen: onOpenFile,
                   depth: depth + 1,
                   openFiles: openFiles,

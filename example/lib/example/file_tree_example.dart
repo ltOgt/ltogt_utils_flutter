@@ -20,10 +20,11 @@ class FileTreeExample extends StatelessWidget {
           FileTreeDir(
             name: "example",
             files: [
-              FileTreeFile(name: "auto_size_text.dart"),
+              FileTreeFile(name: "xyz.dart"),
               FileTreeFile(name: "cached_builder.dart"),
-              FileTreeFile(name: "file_tree_example.dart"),
+              FileTreeFile(name: "auto_size_text.dart"),
               FileTreeFile(name: "line_widget.dart"),
+              FileTreeFile(name: "file_tree_example.dart"),
             ],
           ),
         ], files: [
@@ -41,10 +42,7 @@ class FileTreeExample extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'FileTreeWidget example',
-      home: Scaffold(
-        backgroundColor: Colors.grey,
-        body: TreeStateWidget(fileTree: fileTree),
-      ),
+      home: TreeStateWidget(fileTree: fileTree),
     );
   }
 }
@@ -65,35 +63,57 @@ class _TreeStateWidgetState extends State<TreeStateWidget> {
   Set<FileTreePath> expandedDirs = {};
   Set<FileTreePath> openFiles = {};
 
+  var sorting = FileTreeSorting.none;
+  void nextSorting() {
+    setState(() {
+      switch (sorting) {
+        case FileTreeSorting.descending:
+          sorting = FileTreeSorting.ascending;
+          break;
+        case FileTreeSorting.ascending:
+          sorting = FileTreeSorting.none;
+          break;
+        case FileTreeSorting.none:
+          sorting = FileTreeSorting.descending;
+          break;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FileTreeWidget(
-      expandedDirectories: expandedDirs,
-      onToggleDirExpansion: (path, expanded) {
-        if (expanded) {
-          expandedDirs.add(path);
-        } else {
-          expandedDirs.remove(path);
-        }
-        setState(() {});
-      },
-      fileTree: widget.fileTree,
-      openFiles: openFiles,
-      onOpenFile: (file) {
-        if (openFiles.contains(file)) {
-          openFiles.remove(file);
-        } else {
-          openFiles.add(file);
-        }
-        setState(() {});
-      },
-      style: const FileTreeWidgetStyle(
-        openFileRowStyle: FileTreeEntryStyle(
-          colorBg: Colors.black,
-          hoverColor: Color(0x55FFFFFF),
-          iconColor: Colors.white,
-          textStyle: TextStyle(color: Colors.white),
-          scopeIndicatorColor: Colors.white,
+    return Scaffold(
+      backgroundColor: Colors.blueGrey[800],
+      floatingActionButton: FloatingActionButton(onPressed: nextSorting),
+      body: FileTreeWidget(
+        sorting: sorting,
+        expandedDirectories: expandedDirs,
+        onToggleDirExpansion: (path, expanded) {
+          if (expanded) {
+            expandedDirs.add(path);
+          } else {
+            expandedDirs.remove(path);
+          }
+          setState(() {});
+        },
+        fileTree: widget.fileTree,
+        openFiles: openFiles,
+        onOpenFile: (file) {
+          if (openFiles.contains(file)) {
+            openFiles.remove(file);
+          } else {
+            openFiles.add(file);
+          }
+          setState(() {});
+        },
+        style: const FileTreeWidgetStyle(
+          openFileRowStyle: FileTreeEntryStyle(
+            colorBg: Colors.black,
+            hoverColor: Color(0x55FFFFFF),
+            iconColor: Colors.white,
+            textStyle: TextStyle(color: Colors.white),
+            scopeIndicatorColor: Colors.white,
+          ),
         ),
       ),
     );
