@@ -5,14 +5,17 @@ class AutoSizeText extends StatelessWidget {
     Key? key,
     required this.text,
     this.style,
+    this.alignment = Alignment.center,
   }) : super(key: key);
 
   final String text;
   final TextStyle? style;
+  final Alignment alignment;
 
   @override
   Widget build(BuildContext context) {
     return FittedBox(
+      alignment: alignment,
       fit: BoxFit.contain,
       child: Text(
         text,
