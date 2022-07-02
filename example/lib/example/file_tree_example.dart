@@ -14,7 +14,9 @@ class FileTreeExample extends StatelessWidget {
       dirs: [
         FileTreeDir(
           name: "build",
-          dirs: [],
+          files: [
+            FileTreeFile(name: "xyz.dart"),
+          ],
         ),
         FileTreeDir(name: "lib", dirs: [
           FileTreeDir(
@@ -83,7 +85,7 @@ class _TreeStateWidgetState extends State<TreeStateWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueGrey[800],
+      backgroundColor: Colors.white,
       floatingActionButton: FloatingActionButton(onPressed: nextSorting),
       body: FileTreeWidget(
         sorting: sorting,
@@ -107,12 +109,19 @@ class _TreeStateWidgetState extends State<TreeStateWidget> {
           setState(() {});
         },
         style: const FileTreeWidgetStyle(
-          openFileRowStyle: FileTreeEntryStyle(
-            colorBg: Colors.black,
+          fileRowStyle: FileTreeEntryStyle(
+            colorBg: Colors.white,
             hoverColor: Color(0x55FFFFFF),
-            iconColor: Colors.white,
-            textStyle: TextStyle(color: Colors.white),
-            scopeIndicatorColor: Colors.white,
+            iconColor: Colors.black,
+            textStyle: TextStyle(color: Colors.black),
+            scopeIndicatorColor: Colors.black,
+          ),
+          openFileRowStyle: FileTreeEntryStyle(
+            colorBg: Colors.grey,
+            hoverColor: Color(0x55FFFFFF),
+            iconColor: Colors.black,
+            textStyle: TextStyle(color: Colors.black),
+            scopeIndicatorColor: Colors.black,
           ),
         ),
       ),
