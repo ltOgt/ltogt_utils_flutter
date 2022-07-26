@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
 
 import 'example/disposable_state.dart';
+import 'example/state_component.dart';
 
 const Map<String, Widget> examplesNameWidget = {
   "DisposableStateExample": DisposableStateExample(),
@@ -13,6 +14,7 @@ const Map<String, Widget> examplesNameWidget = {
   "CachedBuilderExample": CachedBuilderExample(),
   "AutoSizeTextExample": AutoSizeTextExample(),
   "FileTreeExample": FileTreeExample(),
+  "StateComponentExample": StateComponentExample(),
 };
 
 void main() {
