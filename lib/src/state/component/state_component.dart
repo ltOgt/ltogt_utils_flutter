@@ -36,23 +36,50 @@ class StateComponent<T> {
   }
 
   StateComponent({
-    required T Function() onInit,
+    required T Function()? onInit,
     required void Function(T value) onDispose,
+    T? Function(T? value)? onDidChangeDependencies,
+    T? Function(Widget oldWidget)? onDidUpdateWidget,
     required ComponentState state,
   })  : _onInit = onInit,
-        _onDispose = onDispose {
+        _onDispose = onDispose,
+        _onDidChangeDependecies = onDidChangeDependencies,
+        _onDidUpdateWidget = onDidUpdateWidget,
+        assert(onInit != null || onDidChangeDependencies != null) {
     state._componentAdd(this);
   }
 
   /// Callback to initialize [T]
-  final T Function() _onInit;
+  final T Function()? _onInit;
 
   /// Callback to dispose [T]
   final void Function(T value) _onDispose;
 
+  final T? Function(T? value)? _onDidChangeDependecies;
+
+  final T? Function(Widget oldWidget)? _onDidUpdateWidget;
+
   /// Called by [StateComponent]
+  ///
+  /// It is legal to use [_onDidChangeDependecies] instead.
+  /// In that case the first call of [_onDidChangeDependecies] must return a non-null value.
   void _init() {
-    _value = _onInit();
+    _value = _onInit?.call();
+  }
+
+  /// Called by [StateComponent]
+  void _didChangeDependencies() {
+    _value = _onDidChangeDependecies?.call(_value) ?? _value;
+    assert(
+      _value != null,
+      "If _init is not provided, the _value will be null on the first call of _didChangeDependencies\n"
+      "In this case, the first call to _onDidChangeDependecies must return a non-null value",
+    );
+  }
+
+  /// Called by [StateComponent]
+  void _didUpdateWidget(Widget oldWidget) {
+    _value = _onDidUpdateWidget?.call(oldWidget) ?? _value;
   }
 
   /// Called by [StateComponent]
@@ -101,6 +128,22 @@ abstract class ComponentState<T extends StatefulWidget> extends State<T> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _isBeforeFirstBuild = false;
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    for (var e in components) {
+      e._didChangeDependencies();
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
+  void didUpdateWidget(covariant T oldWidget) {
+    for (var e in components) {
+      e._didUpdateWidget(oldWidget);
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
