@@ -90,7 +90,7 @@ class StateComponent<T> {
   }
 
   @override
-  bool operator ==(covariant StateComponent<T> other) {
+  bool operator ==(covariant StateComponent other) {
     if (identical(this, other)) return true;
 
     return other._value == _value;
