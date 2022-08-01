@@ -23,6 +23,8 @@ import 'package:flutter/widgets.dart';
 /// }
 /// ```
 class StateComponent<T> {
+  final ComponentState state;
+
   /// The instance of the object [T] wrapped by this component
   ///
   /// E.g. ScrollController
@@ -40,7 +42,9 @@ class StateComponent<T> {
     required void Function(T value) onDispose,
     T? Function(T? value)? onDidChangeDependencies,
     T? Function(Widget oldWidget)? onDidUpdateWidget,
-    required ComponentState state,
+    required this.state,
+    this.setStateOnChange = false,
+    this.onChange,
   })  : _onInit = onInit,
         _onDispose = onDispose,
         _onDidChangeDependecies = onDidChangeDependencies,
@@ -59,17 +63,47 @@ class StateComponent<T> {
 
   final T? Function(Widget oldWidget)? _onDidUpdateWidget;
 
+  /// Requires [T] is [Listenable].
+  /// Adds listener that calls [state.setState].
+  ///
+  /// Also see [onChange], for additional side effects.
+  final bool setStateOnChange;
+
+  /// Requires [T] is [Listenable].
+  /// Adds [onChange] callback.
+  ///
+  /// Also see [setStateOnChange], which can be combined.
+  final Function()? onChange;
+
   /// Called by [StateComponent]
   ///
   /// It is legal to use [_onDidChangeDependecies] instead.
   /// In that case the first call of [_onDidChangeDependecies] must return a non-null value.
   void _init() {
     _value = _onInit?.call();
+    _listenIfWanted();
+  }
+
+  void _onChange() {
+    if (setStateOnChange) {
+      // ignore: invalid_use_of_protected_member
+      state.setState(() {});
+    }
+    onChange?.call();
+  }
+
+  bool get shouldListen => setStateOnChange || onChange != null;
+  bool _listening = false;
+  void _listenIfWanted() {
+    if (!_listening && shouldListen && _value != null && _value is Listenable) {
+      (_value as Listenable).addListener(_onChange);
+    }
   }
 
   /// Called by [StateComponent]
   void _didChangeDependencies() {
     _value = _onDidChangeDependecies?.call(_value) ?? _value;
+    _listenIfWanted();
     assert(
       _value != null,
       "If _init is not provided, the _value will be null on the first call of _didChangeDependencies\n"
@@ -85,6 +119,12 @@ class StateComponent<T> {
   /// Called by [StateComponent]
   void _dispose() {
     if (_value == null) throw StateError("value not initialiuzed! call init()");
+
+    if (_listening) {
+      (_value as Listenable).removeListener(_onChange);
+      _listening = false;
+    }
+
     // ignore: null_check_on_nullable_type_parameter
     _onDispose(_value!);
   }
