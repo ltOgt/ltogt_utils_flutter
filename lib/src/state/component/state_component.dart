@@ -148,26 +148,8 @@ abstract class ComponentState<T extends StatefulWidget> extends State<T> {
 
   /// Called by [StateComponent] to self register
   void _componentAdd(StateComponent c) {
-    assert(_isBeforeFirstBuild);
     components.add(c);
     c._init();
-  }
-
-  /// Used to assert that no components are added after [initState] has been called.
-  ///
-  /// Only works indirectly by lowering this flag after first build.
-  bool _isBeforeFirstBuild = true;
-
-  @override
-  @mustCallSuper
-  void initState() {
-    super.initState();
-
-    /// Need to set to false after first build, since [initState] is called
-    /// before [StateComponent]s can self register via [_componentAdd]
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _isBeforeFirstBuild = false;
-    });
   }
 
   @override
