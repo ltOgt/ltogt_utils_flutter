@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+@Deprecated("Use ComponentState and StateComponent instead")
 class SmallState<T> {
   /// Value of the disposable.
   ///
@@ -68,6 +69,7 @@ class SmallState<T> {
         assert((value == null) != (init == null && dispose == null), "Must pass value XOR init & dispose");
 }
 
+@Deprecated("Use ComponentState and StateComponent instead")
 class SmallStateBuilder extends StatefulWidget {
   SmallStateBuilder({
     Key? key,
@@ -121,6 +123,7 @@ class _SmallStateBuilderState extends State<SmallStateBuilder> {
   }
 }
 
+@Deprecated("Use ComponentState and StateComponent instead")
 class SmallStateDefaults {
   /// Use [value] or create new [T] to be used via [SmallStateBuilder].
   /// Optionally add a listener.
@@ -153,6 +156,8 @@ class SmallStateDefaults {
 
   /// Use [value] or create new [ScrollController] to be used via [SmallStateBuilder].
   /// Optionally add a listener.
+  ///
+  @Deprecated("Use ComponentState and StateComponent instead")
   static SmallState<ScrollController> scrollController({
     void Function(ScrollController ctrl)? onChange,
     ScrollController? value,

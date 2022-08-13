@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
+import 'package:ltogt_utils_flutter/src/widget/builder/small_state.dart';
 
 class DisposableStateExample extends StatelessWidget {
   const DisposableStateExample({Key? key}) : super(key: key);
