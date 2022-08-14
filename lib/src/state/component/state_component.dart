@@ -32,8 +32,14 @@ class StateComponent<T> {
 
   /// Returns the wrapped instance of [T]
   T get value {
-    /// [init()] will be called by [ComponentState]
-    if (_value == null) throw StateError("value not initialized! call init()");
+    /// [init()] will be called by [ComponentState].
+    /// It is also legal to only execute after initState via didChangeDependencies
+    if (_value == null) {
+      _didChangeDependencies();
+    }
+    if (_value == null) {
+      throw StateError("value not initialized! call init()");
+    }
     return _value!;
   }
 
