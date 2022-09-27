@@ -136,7 +136,11 @@ class LinePath {
 
     // Union over all paths
     for (final _lp in _linePaths) {
-      _circlePath = Path.combine(PathOperation.union, _circlePath, _lp);
+      try {
+        _circlePath = Path.combine(PathOperation.union, _circlePath, _lp);
+      } catch (_) {
+        assert(false, "failed to create union");
+      }
     }
 
     path = _circlePath;
