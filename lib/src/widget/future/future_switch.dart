@@ -24,24 +24,16 @@ class FutureSwitch<T> extends StatelessWidget {
     return FutureBuilder<T>(
       future: future,
       builder: (BuildContext context, AsyncSnapshot<T> snap) {
-        if ([
-          ConnectionState.none,
-          ConnectionState.waiting,
-          ConnectionState.active,
-        ].contains(snap.connectionState)) {
-          return buildWait(snap);
-        } else if (ConnectionState.done == snap.connectionState) {
-          if (snap.hasError) {
-            return buildError(snap);
-          } else if (snap.hasData) {
-            return buildDone(snap);
-          }
-          // no error but also no data
-          return buildDone(snap);
+        switch (snap.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+          case ConnectionState.active:
+            return buildWait(snap);
+          case ConnectionState.done:
+            return snap.hasError //
+                ? buildError(snap)
+                : buildDone(snap);
         }
-
-        assert(false, "Unexpected State");
-        return buildError(snap);
       },
     );
   }
