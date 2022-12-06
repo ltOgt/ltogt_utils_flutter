@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'dart:async';
 
 class RenderHelper {
   /// Add a callback to be executed on the next frame.
@@ -70,5 +71,11 @@ class RenderHelper {
 
   static RenderObject? getRenderObject({required GlobalKey globalKey}) {
     return globalKey.currentContext?.findRenderObject();
+  }
+  
+  static Future get nextFrameFuture {
+    Completer completer = Completer();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => completer.complete());
+    await completer.future;
   }
 }
