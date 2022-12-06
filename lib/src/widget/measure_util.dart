@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import '../overlay_manager.dart';
-import '../post_frame/render_helper.dart';
+import 'overlay_manager.dart';
+import 'post_frame/render_helper.dart';
 
 /// Small utility to measure a widget before actually putting it on screen.
 ///
