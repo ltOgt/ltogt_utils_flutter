@@ -5,11 +5,8 @@ class RenderHelper {
   /// Add a callback to be executed on the next frame.
   ///
   /// This can be useful if you need to call e.g. [RenderHelper.getSize]
-  ///
-  /// Returns true if sucessfull, false if [WidgetsBinding.instance] is null.
   static bool addPostFrameCallback(Function(Duration) callback) {
     final instance = WidgetsBinding.instance;
-    if (instance == null) return false;
 
     instance.addPostFrameCallback(callback);
     return true;
@@ -72,8 +69,8 @@ class RenderHelper {
   static RenderObject? getRenderObject({required GlobalKey globalKey}) {
     return globalKey.currentContext?.findRenderObject();
   }
-  
-  static Future get nextFrameFuture {
+
+  static Future get nextFrameFuture async {
     Completer completer = Completer();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) => completer.complete());
     await completer.future;

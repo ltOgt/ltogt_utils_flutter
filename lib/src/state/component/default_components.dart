@@ -4,24 +4,30 @@ import 'state_component.dart';
 
 class StateComponentText extends StateComponent<TextEditingController> {
   StateComponentText({
-    required ComponentState<StatefulWidget> state,
+    required super.state,
     TextEditingController Function()? onInit,
     void Function(TextEditingController value)? onDispose,
+    super.onChange,
+    super.setStateOnChange,
+    super.onDidChangeDependencies,
+    super.onDidUpdateWidget,
   }) : super(
           onInit: onInit ?? () => TextEditingController(),
           onDispose: onDispose ?? (v) => v.dispose(),
-          state: state,
         );
 }
 
 class StateComponentScroll extends StateComponent<ScrollController> {
   StateComponentScroll({
-    required ComponentState<StatefulWidget> state,
+    required super.state,
     ScrollController Function()? onInit,
     void Function(ScrollController value)? onDispose,
+    super.onChange,
+    super.setStateOnChange,
+    super.onDidChangeDependencies,
+    super.onDidUpdateWidget,
   }) : super(
           onInit: onInit ?? () => ScrollController(),
           onDispose: onDispose ?? (v) => v.dispose(),
-          state: state,
         );
 }
