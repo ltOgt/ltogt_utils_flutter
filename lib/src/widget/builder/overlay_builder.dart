@@ -29,7 +29,7 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
 
   void _showOverlay() {
     _overlayEntry = buildOverlay();
-    Overlay.of(context)?.insert(_overlayEntry);
+    Overlay.of(context).insert(_overlayEntry);
   }
 
   void _hideOverlay() {

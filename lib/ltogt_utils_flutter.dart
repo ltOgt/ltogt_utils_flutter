@@ -31,7 +31,7 @@ export 'src/widget/overlay_manager.dart';
 export 'src/state/model/stateful_model.dart';
 
 export 'src/state/component/state_component.dart';
-export 'src/state/component/scroll_component.dart';
+export 'src/state/component/default_components.dart';
 
 export 'src/device/device_type.dart';
 
