@@ -29,6 +29,7 @@ export 'src/widget/file_tree_widget.dart';
 export 'src/widget/overlay_manager.dart';
 
 export 'src/state/model/stateful_model.dart';
+export 'src/state/model/m_prop.dart';
 
 export 'src/state/component/state_component.dart';
 export 'src/state/component/default_components.dart';
