@@ -1,5 +1,6 @@
 import 'package:example/example/auto_size_text.dart';
 import 'package:example/example/cached_builder.dart';
+import 'package:example/example/decorated_scrollable.dart';
 import 'package:example/example/file_tree_example.dart';
 import 'package:example/example/line_widget.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ const Map<String, Widget> examplesNameWidget = {
   "AutoSizeTextExample": AutoSizeTextExample(),
   "FileTreeExample": FileTreeExample(),
   "StateComponentExample": StateComponentExample(),
+  "DecoratedScrollable": DecoratedScrollableExample(),
 };
 
 void main() {
