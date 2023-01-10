@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 /// Depending on the state of the supplied [future], one of three builders is called:
@@ -15,8 +16,8 @@ class FutureSwitch<T> extends StatelessWidget {
     Key? key,
     required this.future,
     required this.buildWait,
-    required this.buildDone,
-    required this.buildError,
+    this.buildDone = defaultWait,
+    this.buildError = defaultError,
   }) : super(key: key);
 
   @override
@@ -37,4 +38,7 @@ class FutureSwitch<T> extends StatelessWidget {
       },
     );
   }
+
+  static Widget defaultWait(dynamic _) => const Center(child: CircularProgressIndicator());
+  static Widget defaultError(dynamic _) => const Center(child: Icon(Icons.error));
 }
