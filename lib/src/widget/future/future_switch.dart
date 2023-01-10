@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 /// Depending on the state of the supplied [future], one of three builders is called:
 ///
@@ -15,8 +14,8 @@ class FutureSwitch<T> extends StatelessWidget {
   const FutureSwitch({
     Key? key,
     required this.future,
-    required this.buildWait,
-    this.buildDone = defaultWait,
+    required this.buildDone,
+    this.buildWait = defaultWait,
     this.buildError = defaultError,
   }) : super(key: key);
 
