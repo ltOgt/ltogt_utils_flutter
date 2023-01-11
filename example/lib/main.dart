@@ -8,6 +8,7 @@ import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
 
 import 'example/disposable_state.dart';
 import 'example/state_component.dart';
+import 'example/tree_widget_example.dart';
 
 const Map<String, Widget> examplesNameWidget = {
   "DisposableStateExample": DisposableStateExample(),
@@ -15,6 +16,7 @@ const Map<String, Widget> examplesNameWidget = {
   "CachedBuilderExample": CachedBuilderExample(),
   "AutoSizeTextExample": AutoSizeTextExample(),
   "FileTreeExample": FileTreeExample(),
+  "TreeWidgetExample": TreeWidgetExample(),
   "StateComponentExample": StateComponentExample(),
   "DecoratedScrollable": DecoratedScrollableExample(),
 };

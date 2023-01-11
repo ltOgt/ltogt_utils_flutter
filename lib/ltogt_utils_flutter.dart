@@ -25,6 +25,7 @@ export 'src/widget/text/measure_text.dart';
 export 'src/widget/size_helper.dart';
 
 export 'src/widget/file_tree_widget.dart';
+export 'src/widget/tree_widget.dart';
 
 export 'src/widget/overlay_manager.dart';
 
