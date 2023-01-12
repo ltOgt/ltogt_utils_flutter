@@ -20,49 +20,89 @@ class TreeLeaf extends TreeNodeAbst {
   final Widget Function(BuildContext context, TreeBuilderDetails details) builder;
 }
 
+enum TreeVisibilityMode {
+  /// Every ID will be considered collapsed
+  allCollapsed,
+
+  /// Every ID will be considered expanded
+  allExpanded,
+
+  /// Every ID will be considered collapsed unless in the expanded set
+  expanded,
+
+  /// Every ID will be considered expanded unless in the collapsed set
+  collapsed,
+}
+
 class TreeVisibility {
-  final Set<String>? collapsed;
-  final Set<String>? expanded;
-  final bool allCollapsed;
-  final bool allExpanded;
+  final TreeVisibilityMode mode;
+  final Set<String>? explicit;
 
   /// does not say whether this id would be visible,
   /// since a parent could be collapsed.
-  bool isExpanded(String id) =>
-      allExpanded || //
-      !allCollapsed && //
-          (expanded?.contains(id) ?? !collapsed!.contains(id));
+  bool isExpanded(String id) {
+    switch (mode) {
+      case TreeVisibilityMode.allCollapsed:
+        return false;
+      case TreeVisibilityMode.allExpanded:
+        return true;
+      case TreeVisibilityMode.expanded:
+        return explicit!.contains(id);
+      case TreeVisibilityMode.collapsed:
+        return !explicit!.contains(id);
+    }
+  }
 
   const TreeVisibility.allCollapsed()
-      : this.allCollapsed = true,
-        this.allExpanded = false,
-        this.collapsed = null,
-        this.expanded = null;
+      : this.mode = TreeVisibilityMode.allCollapsed,
+        this.explicit = null;
 
   const TreeVisibility.allExpanded()
-      : this.allCollapsed = false,
-        this.allExpanded = true,
-        this.collapsed = null,
-        this.expanded = null;
+      : this.mode = TreeVisibilityMode.allExpanded,
+        this.explicit = null;
 
-  const TreeVisibility.collapsed(this.collapsed, [this.expanded])
-      : this.allCollapsed = false,
-        this.allExpanded = false;
+  const TreeVisibility.collapsed(this.explicit) : this.mode = TreeVisibilityMode.collapsed;
 
-  const TreeVisibility.expanded(this.expanded, [this.collapsed])
-      : this.allCollapsed = false,
-        this.allExpanded = false;
+  const TreeVisibility.expanded(this.explicit) : this.mode = TreeVisibilityMode.expanded;
+
+  const TreeVisibility._({
+    required this.mode,
+    required this.explicit,
+  });
 
   TreeVisibility expandAll() => TreeVisibility.allExpanded();
   TreeVisibility collapseAll() => TreeVisibility.allCollapsed();
-  TreeVisibility expand(String id) => TreeVisibility.expanded(
-        CollectionUtils.setAdd(expanded ?? {}, id),
-        collapsed == null ? null : CollectionUtils.setRemove(collapsed!, id),
-      );
-  TreeVisibility collapse(String id) => TreeVisibility.collapsed(
-        CollectionUtils.setAdd(collapsed ?? {}, id),
-        expanded == null ? null : CollectionUtils.setRemove(expanded!, id),
-      );
+  TreeVisibility expand(Set<String> ids) {
+    switch (mode) {
+      case TreeVisibilityMode.allCollapsed:
+        return TreeVisibility.expanded({...ids});
+      case TreeVisibilityMode.allExpanded:
+        return TreeVisibility.allExpanded();
+      case TreeVisibilityMode.expanded:
+        return TreeVisibility._(mode: mode, explicit: {...explicit!, ...ids});
+      case TreeVisibilityMode.collapsed:
+        return TreeVisibility._(mode: mode, explicit: {
+          for (final e in explicit!)
+            if (!ids.contains(e)) e
+        });
+    }
+  }
+
+  TreeVisibility collapse(Set<String> ids) {
+    switch (mode) {
+      case TreeVisibilityMode.allCollapsed:
+        return TreeVisibility.allCollapsed();
+      case TreeVisibilityMode.allExpanded:
+        return TreeVisibility.collapsed(ids);
+      case TreeVisibilityMode.expanded:
+        return TreeVisibility._(mode: mode, explicit: {
+          for (final e in explicit!)
+            if (!ids.contains(e)) e
+        });
+      case TreeVisibilityMode.collapsed:
+        return TreeVisibility._(mode: mode, explicit: {...explicit!, ...ids});
+    }
+  }
 }
 
 class TreeWidget extends StatelessWidget {

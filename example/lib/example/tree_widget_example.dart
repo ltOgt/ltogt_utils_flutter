@@ -22,8 +22,7 @@ class _TreeWidgetExampleState extends State<TreeWidgetExample> {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () => setState(() {
-          visibility = details.isExpanded ? visibility.collapse(details.id) : visibility.expand(details.id);
-          print(visibility);
+          visibility = details.isExpanded ? visibility.collapse({details.id}) : visibility.expand({details.id});
         }),
         child: _buildNode(context, details, true),
       ),
@@ -92,99 +91,64 @@ class _TreeWidgetExampleState extends State<TreeWidgetExample> {
     ],
   );
 
+  late final rootNodeDeep = TreeNode(
+    id: "root",
+    builder: buildNode,
+    children: _generateChildren(9),
+  );
+
+  List<TreeNodeAbst> _generateChildren(int depth) {
+    final count = Random().nextInt(3) + 3;
+    return [for (int i = 0; i < count; i++) _generateChild(depth - 1)];
+  }
+
+  TreeNodeAbst _generateChild(int depth) {
+    if (depth == 0 || Random().nextBool()) {
+      return TreeLeaf(id: "${Random().nextInt(999999)}", builder: buildLeaf);
+    }
+    return TreeNode(id: "${Random().nextInt(999999)}", builder: buildNode, children: _generateChildren(depth - 1));
+  }
+
+  String get _visibilityText => """
+VISBILITY - ${visibility.mode}
+
+explicit - ${visibility.explicit}
+""";
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'TreeWidget example',
       theme: ThemeData.dark(),
       home: Scaffold(
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.max,
           children: [
-            TreeWidget(
-              treeNodeRoot: rootNode,
-              treeVisibility: visibility,
+            Text(_visibilityText),
+            FloatingActionButton(
+              onPressed: () => setState(() {
+                visibility = visibility.expandAll();
+              }),
+              child: const Icon(Icons.fullscreen),
+            ),
+            FloatingActionButton(
+              onPressed: () => setState(() {
+                visibility = visibility.collapseAll();
+              }),
+              child: const Icon(Icons.fullscreen_exit),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class TreeStateWidget extends StatefulWidget {
-  const TreeStateWidget({
-    Key? key,
-    required this.fileTree,
-  }) : super(key: key);
-
-  final FileTree fileTree;
-
-  @override
-  State<TreeStateWidget> createState() => _TreeStateWidgetState();
-}
-
-class _TreeStateWidgetState extends State<TreeStateWidget> {
-  Set<FileTreePath> expandedDirs = {};
-  Set<FileTreePath> openFiles = {};
-
-  var sorting = FileTreeSorting.none;
-  void nextSorting() {
-    setState(() {
-      switch (sorting) {
-        case FileTreeSorting.descending:
-          sorting = FileTreeSorting.ascending;
-          break;
-        case FileTreeSorting.ascending:
-          sorting = FileTreeSorting.none;
-          break;
-        case FileTreeSorting.none:
-          sorting = FileTreeSorting.descending;
-          break;
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      floatingActionButton: FloatingActionButton(onPressed: nextSorting),
-      body: FileTreeWidget(
-        sorting: sorting,
-        expandedDirectories: expandedDirs,
-        onToggleDirExpansion: (path, expanded) {
-          if (expanded) {
-            expandedDirs.add(path);
-          } else {
-            expandedDirs.remove(path);
-          }
-          setState(() {});
-        },
-        fileTree: widget.fileTree,
-        openFiles: openFiles,
-        onOpenFile: (file) {
-          if (openFiles.contains(file)) {
-            openFiles.remove(file);
-          } else {
-            openFiles.add(file);
-          }
-          setState(() {});
-        },
-        style: const FileTreeWidgetStyle(
-          fileRowStyle: FileTreeEntryStyle(
-            colorBg: Colors.white,
-            hoverColor: Color(0x55FFFFFF),
-            iconColor: Colors.black,
-            textStyle: TextStyle(color: Colors.black),
-            scopeIndicatorColor: Colors.black,
-          ),
-          openFileRowStyle: FileTreeEntryStyle(
-            colorBg: Colors.grey,
-            hoverColor: Color(0x55FFFFFF),
-            iconColor: Colors.black,
-            textStyle: TextStyle(color: Colors.black),
-            scopeIndicatorColor: Colors.black,
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TreeWidget(
+                treeNodeRoot: rootNodeDeep,
+                treeVisibility: visibility,
+              ),
+            ],
           ),
         ),
       ),
