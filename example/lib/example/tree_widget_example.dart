@@ -35,7 +35,10 @@ class _TreeWidgetExampleState extends State<TreeWidgetExample> {
         false,
       );
 
-  Color _colorForDepth(int d) => Colors.white.withOpacity(min(1, d / 6 + .1));
+  Color _(Color c) => Color.fromARGB(c.alpha, 255 - c.red, 255 - c.green, 255 - c.blue);
+  Color _colorForDepth(int d) => Color.lerp(Colors.black, Colors.white, d / depth)!;
+  TextStyle _textForDepth(int d) =>
+      TextStyle(color: _colorForDepth(d).computeLuminance() > 0.5 ? Colors.black : Colors.white);
   Widget _buildNode(BuildContext context, TreeBuilderDetails details, bool isNode) {
     return SizedBox(
       height: 20,
@@ -59,7 +62,9 @@ class _TreeWidgetExampleState extends State<TreeWidgetExample> {
                       : null,
             ),
             child: Text(
-                "${isNode ? "NODE" : "LEAF"}<${details.id}> - ${details.index}...${details.last}${isNode ? details.isExpanded ? "  EXPANDED" : "  COLLAPSED" : ""}"),
+              "${isNode ? "NODE" : "LEAF"}<${details.id}> - ${details.index}...${details.last}${isNode ? details.isExpanded ? "  EXPANDED" : "  COLLAPSED" : ""}",
+              style: _textForDepth(details.depth),
+            ),
           ),
         ],
       ),
@@ -91,22 +96,34 @@ class _TreeWidgetExampleState extends State<TreeWidgetExample> {
     ],
   );
 
-  late final rootNodeDeep = TreeNode(
-    id: "root",
-    builder: buildNode,
-    children: _generateChildren(9),
-  );
-
-  List<TreeNodeAbst> _generateChildren(int depth) {
-    final count = Random().nextInt(3) + 3;
-    return [for (int i = 0; i < count; i++) _generateChild(depth - 1)];
+  void rebuild_rootNodeDeep(int depth) {
+    setState(() {
+      this.depth = depth;
+      rootNodeDeep = TreeNode(
+        id: "root",
+        builder: buildNode,
+        children: _generateChildren(depth),
+      );
+    });
   }
 
-  TreeNodeAbst _generateChild(int depth) {
-    if (depth == 0 || Random().nextBool()) {
+  int depth = 5;
+  late var rootNodeDeep = TreeNode(
+    id: "root",
+    builder: buildNode,
+    children: _generateChildren(depth),
+  );
+
+  List<TreeNodeAbst> _generateChildren(int depth, [int? max]) {
+    final count = Random().nextInt(3) + (depth / 2).round();
+    return [for (int i = 0; i < count; i++) _generateChild(depth - 1, depth)];
+  }
+
+  TreeNodeAbst _generateChild(int depth, int max) {
+    if (depth == 0 || Random().nextDouble() < (1 - depth / max) + .25) {
       return TreeLeaf(id: "${Random().nextInt(999999)}", builder: buildLeaf);
     }
-    return TreeNode(id: "${Random().nextInt(999999)}", builder: buildNode, children: _generateChildren(depth - 1));
+    return TreeNode(id: "${Random().nextInt(999999)}", builder: buildNode, children: _generateChildren(depth - 1, max));
   }
 
   String get _visibilityText => """
@@ -137,6 +154,22 @@ explicit - ${visibility.explicit}
                 visibility = visibility.collapseAll();
               }),
               child: const Icon(Icons.fullscreen_exit),
+            ),
+            FloatingActionButton(
+              onPressed: () => rebuild_rootNodeDeep(max(1, depth - 1)),
+              child: const Icon(Icons.remove),
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                color: Colors.grey,
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.all(20),
+              child: Text("$depth", style: const TextStyle(color: Colors.black)),
+            ),
+            FloatingActionButton(
+              onPressed: () => rebuild_rootNodeDeep(depth + 1),
+              child: const Icon(Icons.add),
             ),
           ],
         ),
