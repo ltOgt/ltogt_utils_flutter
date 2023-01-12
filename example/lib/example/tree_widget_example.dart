@@ -142,7 +142,17 @@ explicit - ${visibility.explicit}
           mainAxisAlignment: MainAxisAlignment.end,
           mainAxisSize: MainAxisSize.max,
           children: [
-            Text(_visibilityText),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    const SizedBox(width: 400),
+                    Text(_visibilityText),
+                  ],
+                ),
+              ),
+            ),
             FloatingActionButton(
               onPressed: () => setState(() {
                 visibility = visibility.expandAll();
