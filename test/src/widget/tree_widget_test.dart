@@ -150,3 +150,108 @@
 //     });
 //   });
 // }
+
+import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
+
+void main() {
+  group('TreeVisitor', () {
+    group('visitInOrder', () {
+      test('leaf only => returns only it self', () async {
+        final tree = TreeLeaf(id: "lr", builder: (_, __) => SizedBox());
+        final visibilityMock = TreeVisibilityNeverCalled.any();
+        final asList = [
+          for (final visitor in TreeVisitor.visitInOrder(tree, visibilityMock)) //
+            visitor,
+        ];
+
+        expect(asList, [TreeVisitorData(parent: null, node: tree, depth: 0, index: 0, last: 0)]);
+        expect(visibilityMock.neverCalled, isTrue);
+      });
+
+      group("deep tree", () {
+        final builder = (context, details) => SizedBox();
+        final b = TreeLeaf(id: "b", builder: builder);
+        final a2a = TreeLeaf(id: "a2a", builder: builder);
+        final a2 = TreeNode(id: "a2", builder: builder, children: [a2a]);
+        final a1 = TreeLeaf(id: "a1", builder: builder);
+        final a = TreeNode(id: "a", builder: builder, children: [a1, a2]);
+        final tree = TreeNode(id: "r", builder: builder, children: [a, b]);
+
+        test('complex node + all collapsed => returns only root', () async {
+          final asList = [
+            for (final visitor in TreeVisitor.visitInOrder(tree, TreeVisibility.allCollapsed())) //
+              visitor,
+          ];
+
+          expect(asList, [TreeVisitorData(parent: null, node: tree, depth: 0, index: 0, last: 0)]);
+        });
+
+        test('complex node + all expanded => returns all in order', () async {
+          final asList = [
+            for (final visitor in TreeVisitor.visitInOrder(tree, TreeVisibility.allExpanded())) //
+              visitor,
+          ];
+
+          expect(asList, [
+            TreeVisitorData(parent: null, node: tree, depth: 0, index: 0, last: 0),
+            TreeVisitorData(parent: tree, node: a, depth: 1, index: 0, last: 1),
+            TreeVisitorData(parent: a, node: a1, depth: 2, index: 0, last: 1),
+            TreeVisitorData(parent: a, node: a2, depth: 2, index: 1, last: 1),
+            TreeVisitorData(parent: a2, node: a2a, depth: 3, index: 0, last: 0),
+            TreeVisitorData(parent: tree, node: b, depth: 1, index: 1, last: 1),
+          ]);
+        });
+      });
+    });
+  });
+}
+
+class TreeVisibilityNeverCalled implements TreeVisibility {
+  bool neverCalled = true;
+
+  TreeVisibilityNeverCalled.any();
+
+  @override
+  TreeVisibility collapse(Set<String> ids) {
+    neverCalled = false;
+    return TreeVisibility.allCollapsed();
+  }
+
+  @override
+  TreeVisibility collapseAll() {
+    neverCalled = false;
+    return TreeVisibility.allCollapsed();
+  }
+
+  @override
+  TreeVisibility expand(Set<String> ids) {
+    neverCalled = false;
+    return TreeVisibility.allCollapsed();
+  }
+
+  @override
+  TreeVisibility expandAll() {
+    neverCalled = false;
+    return TreeVisibility.allCollapsed();
+  }
+
+  @override
+  Set<String>? get explicit {
+    neverCalled = false;
+    return null;
+  }
+
+  @override
+  bool isExpanded(String id) {
+    neverCalled = false;
+    return false;
+  }
+
+  @override
+  TreeVisibilityMode get mode {
+    neverCalled = false;
+    return TreeVisibilityMode.allCollapsed;
+  }
+}
