@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
 
+// ============================================================================= Nested Tree Data
 abstract class TreeNodeAbst {
   final String id;
   final Widget Function(BuildContext context, TreeBuilderDetails details) builder;
@@ -50,6 +51,8 @@ class TreeLeaf extends TreeNodeAbst {
   @override
   String toString() => 'TreeNode(id: $id)';
 }
+
+// ============================================================================= Tree Visibility
 
 enum TreeVisibilityMode {
   /// Every ID will be considered collapsed
@@ -136,6 +139,8 @@ class TreeVisibility {
   }
 }
 
+// ============================================================================= Tree Widget
+
 class TreeWidget extends StatelessWidget {
   TreeWidget({
     super.key,
@@ -144,7 +149,7 @@ class TreeWidget extends StatelessWidget {
   }) {
     this._children = [];
 
-    for (final v in TreeVisitor.visitInOrder(treeNodeRoot, treeVisibility)) //
+    for (final v in TreeVisitor.visible(treeNodeRoot, treeVisibility)) //
     {
       print(v);
       _children.add(v);
@@ -170,92 +175,6 @@ class TreeWidget extends StatelessWidget {
           ),
         )
     ]);
-
-    if (treeNodeRoot is TreeLeaf) {
-      return (treeNodeRoot as TreeLeaf).builder(
-        context,
-        TreeBuilderDetails(
-          id: treeNodeRoot.id,
-          depth: 0,
-          index: 0,
-          last: 0,
-          isExpanded: false,
-        ),
-      );
-    }
-    return _TreeWidget(
-      treeNode: treeNodeRoot as TreeNode,
-      treeVisibility: treeVisibility,
-      index: 0,
-      last: 0,
-      depth: 0,
-    );
-  }
-}
-
-class _TreeWidget extends StatelessWidget {
-  const _TreeWidget({
-    required this.treeNode,
-    required this.treeVisibility,
-    required this.index,
-    required this.last,
-    required this.depth,
-  });
-
-  final TreeNode treeNode;
-  final TreeVisibility treeVisibility;
-  final int index;
-  final int last;
-  final int depth;
-
-  @override
-  Widget build(BuildContext context) {
-    bool isExpanded = treeVisibility.isExpanded(treeNode.id);
-
-    final _treeNode = treeNode.builder(
-      context,
-      TreeBuilderDetails(
-        id: treeNode.id,
-        index: index,
-        last: last,
-        isExpanded: isExpanded,
-        depth: depth,
-      ),
-    );
-
-    return !isExpanded //
-        ? _treeNode
-        : Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _treeNode,
-              ...useValue(
-                treeNode.children.length - 1,
-                (last) => ListGenerator.forEach(
-                  list: treeNode.children,
-                  builder: (item, index) => item is TreeLeaf //
-                      ? item.builder(
-                          context,
-                          TreeBuilderDetails(
-                            id: item.id,
-                            index: index,
-                            last: last,
-                            isExpanded: false,
-                            depth: depth + 1,
-                          ),
-                        )
-                      : _TreeWidget(
-                          treeNode: item as TreeNode,
-                          treeVisibility: treeVisibility,
-                          index: index,
-                          last: last,
-                          depth: depth + 1,
-                        ),
-                ),
-              )
-            ],
-          );
   }
 }
 
@@ -275,6 +194,8 @@ class TreeBuilderDetails {
   });
 }
 
+// ============================================================================= Visitor
+
 class TreeVisitorData {
   final TreeNode? parent;
 
@@ -289,6 +210,24 @@ class TreeVisitorData {
 
   /// current (parent.length - 1) -> last index in parent
   final int last;
+
+  /// Skip data only available when constructed via [TreeVisitor.flatten]
+  /// Basically nullable late initialization.
+  int? _skip;
+
+  @visibleForTesting
+  set skip(int? v) {
+    // must be nullable since types of set and get must match
+    if (v == null) throw StateError("Dont set skip to null manually");
+    if (_skip != null) throw StateError("Skip already set");
+    _skip = v;
+  }
+
+  /// How many ancestors this node has in total (incl. childrens children etc)
+  /// Only available when constructed via [TreeVisitor.flatten]
+  /// Otherwise always `null`, see [isFlattened]
+  int? get skip => _skip;
+  bool get isFlattened => _skip != null;
 
   TreeVisitorData({
     required this.parent,
@@ -391,7 +330,9 @@ abstract class TreeVisitor {
     throw "Unknown Type ${now.node.runtimeType}";
   }
 
-  static Iterable<TreeVisitorData> visitInOrder(TreeNodeAbst rootNode, TreeVisibility treeVisibility) sync* {
+  /// Takes the nested tree starting at [rootNode] and returns an ordered list of
+  /// all visible nodes ([treeVisibility]) described via [TreeVisitorData].
+  static Iterable<TreeVisitorData> visible(TreeNodeAbst rootNode, TreeVisibility treeVisibility) sync* {
     StackList<TreeVisitorData> stack = StackList();
 
     TreeVisitorData currentNode = TreeVisitorData(
@@ -408,5 +349,46 @@ abstract class TreeVisitor {
       if (_nextOrNull == null) break;
       currentNode = _nextOrNull;
     }
+  }
+
+  /// Takes the nested tree starting at [rootNode] and returns an ordered list of
+  /// all nodes described via [TreeVisitorData].
+  /// Also counts the descendants for each entry into [TreeVisitorData.skip].
+  static List<TreeVisitorData> flatten(TreeNodeAbst rootNode) {
+    final expanded = visible(rootNode, TreeVisibility.allExpanded()).toList();
+    final length = expanded.length;
+
+    int fallback = length + 1;
+    int maxDepth = 0;
+    Map<int, int> previousIndexForDepth = {};
+
+    for (int i = length; i > 0; i--) {
+      final data = expanded[i - 1];
+      final node = data.node;
+      if (node is TreeLeaf) {
+        data.skip = 0;
+      } else {
+        assert(node is TreeNode);
+        final depth = data.depth;
+
+        if (depth > maxDepth) {
+          final previousForOldMaxDepth = previousIndexForDepth[maxDepth] ?? fallback;
+          for (final d in Range(depth, min: maxDepth)) {
+            previousIndexForDepth[d] = previousForOldMaxDepth;
+          }
+
+          maxDepth = depth;
+        }
+
+        final previous = previousIndexForDepth[depth] ?? fallback;
+        final newForDepth = previous - i - 1;
+        for (final d in Range(maxDepth, min: depth)) {
+          previousIndexForDepth[d] = newForDepth;
+        }
+
+        data.skip = newForDepth;
+      }
+    }
+    return expanded;
   }
 }
