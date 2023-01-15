@@ -7,8 +7,9 @@ import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
 
 abstract class TreeNodeAbst {
   final String id;
+  final Widget Function(BuildContext context, TreeBuilderDetails details) builder;
 
-  const TreeNodeAbst({required this.id});
+  const TreeNodeAbst({required this.id, required this.builder});
 }
 
 class TreeNode extends TreeNodeAbst {
@@ -18,7 +19,6 @@ class TreeNode extends TreeNodeAbst {
     required this.children,
   }) : assert(children.isNotEmpty);
 
-  final Widget Function(BuildContext context, TreeBuilderDetails details) builder;
   final List<TreeNodeAbst> children;
 
   @override
@@ -30,12 +30,13 @@ class TreeNode extends TreeNodeAbst {
 
   @override
   int get hashCode => builder.hashCode ^ DeepCollectionEquality().hash(children);
+
+  @override
+  String toString() => 'TreeNode(id: $id, children: $children)';
 }
 
 class TreeLeaf extends TreeNodeAbst {
-  const TreeLeaf({required super.id, required this.builder});
-
-  final Widget Function(BuildContext context, TreeBuilderDetails details) builder;
+  const TreeLeaf({required super.id, required super.builder});
 
   @override
   bool operator ==(covariant TreeLeaf other) {
@@ -46,6 +47,8 @@ class TreeLeaf extends TreeNodeAbst {
 
   @override
   int get hashCode => builder.hashCode;
+  @override
+  String toString() => 'TreeNode(id: $id)';
 }
 
 enum TreeVisibilityMode {
@@ -134,17 +137,40 @@ class TreeVisibility {
 }
 
 class TreeWidget extends StatelessWidget {
-  const TreeWidget({
+  TreeWidget({
     super.key,
     required this.treeNodeRoot,
     required this.treeVisibility,
-  });
+  }) {
+    this._children = [];
+
+    for (final v in TreeVisitor.visitInOrder(treeNodeRoot, treeVisibility)) //
+    {
+      print(v);
+      _children.add(v);
+    }
+  }
 
   final TreeNodeAbst treeNodeRoot;
   final TreeVisibility treeVisibility;
+  late final List<TreeVisitorData> _children;
 
   @override
   Widget build(BuildContext context) {
+    return Column(children: [
+      for (final c in _children) //
+        c.node.builder(
+          context,
+          TreeBuilderDetails(
+            id: c.node.id,
+            depth: c.depth,
+            index: c.index,
+            last: c.last,
+            isExpanded: c.isExpanded(treeVisibility),
+          ),
+        )
+    ]);
+
     if (treeNodeRoot is TreeLeaf) {
       return (treeNodeRoot as TreeLeaf).builder(
         context,
@@ -290,6 +316,11 @@ class TreeVisitorData {
   int get hashCode {
     return parent.hashCode ^ node.hashCode ^ depth.hashCode ^ index.hashCode ^ last.hashCode;
   }
+
+  @override
+  String toString() {
+    return 'TreeVisitorData(p=$parent,n=$node,d=$depth,i=$index,l=$last)';
+  }
 }
 
 abstract class TreeVisitor {
@@ -328,7 +359,7 @@ abstract class TreeVisitor {
   }
 
   // need to build current node before this is called
-  static TreeVisitorData? nextVisitor(TreeVisitorData now, StackList stack, TreeVisibility visibility) {
+  static TreeVisitorData? _nextVisitor(TreeVisitorData now, StackList stack, TreeVisibility visibility) {
     // for tree nodes we always go down into the first child
     // unless the node is not expanded, then we go next
     if (now.node is TreeNode) {
@@ -363,8 +394,7 @@ abstract class TreeVisitor {
   static Iterable<TreeVisitorData> visitInOrder(TreeNodeAbst rootNode, TreeVisibility treeVisibility) sync* {
     StackList<TreeVisitorData> stack = StackList();
 
-    // Current node
-    TreeVisitorData c = TreeVisitorData(
+    TreeVisitorData currentNode = TreeVisitorData(
       parent: null,
       node: rootNode,
       depth: 0,
@@ -373,10 +403,10 @@ abstract class TreeVisitor {
     );
 
     while (true) {
-      yield c;
-      final _newC_orNull = nextVisitor(c, stack, treeVisibility);
-      if (_newC_orNull == null) break;
-      c = _newC_orNull;
+      yield currentNode;
+      final _nextOrNull = _nextVisitor(currentNode, stack, treeVisibility);
+      if (_nextOrNull == null) break;
+      currentNode = _nextOrNull;
     }
   }
 }
