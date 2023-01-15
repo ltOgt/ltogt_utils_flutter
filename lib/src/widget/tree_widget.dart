@@ -12,7 +12,11 @@ abstract class TreeNodeAbst {
 }
 
 class TreeNode extends TreeNodeAbst {
-  const TreeNode({required super.id, required this.builder, required this.children});
+  TreeNode({
+    required super.id,
+    required super.builder,
+    required this.children,
+  }) : assert(children.isNotEmpty);
 
   final Widget Function(BuildContext context, TreeBuilderDetails details) builder;
   final List<TreeNodeAbst> children;

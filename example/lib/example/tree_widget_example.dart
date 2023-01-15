@@ -96,6 +96,7 @@ class _TreeWidgetExampleState extends State<TreeWidgetExample> {
     ],
   );
 
+  CircleIdGen idGen = CircleIdGen();
   void rebuild_rootNodeDeep(int depth) {
     setState(() {
       this.depth = depth;
@@ -115,15 +116,15 @@ class _TreeWidgetExampleState extends State<TreeWidgetExample> {
   );
 
   List<TreeNodeAbst> _generateChildren(int depth, [int? max]) {
-    final count = Random().nextInt(3) + (depth / 2).round();
+    final count = Random().nextInt(3) + (depth / 2).round() + 1;
     return [for (int i = 0; i < count; i++) _generateChild(depth - 1, depth)];
   }
 
   TreeNodeAbst _generateChild(int depth, int max) {
     if (depth == 0 || Random().nextDouble() < (1 - depth / max) + .25) {
-      return TreeLeaf(id: "${Random().nextInt(999999)}", builder: buildLeaf);
+      return TreeLeaf(id: idGen.next.value, builder: buildLeaf);
     }
-    return TreeNode(id: "${Random().nextInt(999999)}", builder: buildNode, children: _generateChildren(depth - 1, max));
+    return TreeNode(id: idGen.next.value, builder: buildNode, children: _generateChildren(depth - 1, max));
   }
 
   String get _visibilityText => """
