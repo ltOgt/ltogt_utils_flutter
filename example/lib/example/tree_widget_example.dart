@@ -35,24 +35,28 @@ class _TreeWidgetExampleState extends State<TreeWidgetExample> {
         false,
       );
 
-  Color _(Color c) => Color.fromARGB(c.alpha, 255 - c.red, 255 - c.green, 255 - c.blue);
   Color _colorForDepth(int d) => Color.lerp(Colors.black, Colors.white, d / depth)!;
-  TextStyle _textForDepth(int d) =>
-      TextStyle(color: _colorForDepth(d).computeLuminance() > 0.5 ? Colors.black : Colors.white);
+  TextStyle _textForDepth(int d) => TextStyle(
+        color: _colorForDepth(d).computeLuminance() > 0.5 ? Colors.black : Colors.white,
+      );
+
+  static const _kWidth = 500.0;
+  static const _kGap = 20.0;
+  static const _kHeight = 20.0;
   Widget _buildNode(BuildContext context, TreeBuilderDetails details, bool isNode) {
     return SizedBox(
-      height: 20,
+      height: _kHeight,
       child: Row(
         children: [
           for (int i = 0; i < details.depth; i++)
             Container(
-              width: 10,
-              height: 20,
+              width: _kGap,
+              height: _kHeight,
               color: _colorForDepth(i),
             ),
           Container(
-            height: 20,
-            width: 250,
+            height: _kHeight,
+            width: _kWidth,
             decoration: BoxDecoration(
               color: _colorForDepth(details.depth),
               borderRadius: details.index == 0
@@ -62,7 +66,7 @@ class _TreeWidgetExampleState extends State<TreeWidgetExample> {
                       : null,
             ),
             child: Text(
-              "${isNode ? "NODE" : "LEAF"}<${details.id}> - ${details.index}...${details.last}${isNode ? details.isExpanded ? "  EXPANDED" : "  COLLAPSED" : ""}",
+              "${isNode ? "NODE" : "LEAF"}<${details.id}> - ${details.index}...${details.last}${isNode ? details.isExpanded ? "  COLLAPSE" : "  EXPAND" : ""}",
               style: _textForDepth(details.depth),
             ),
           ),
@@ -71,54 +75,19 @@ class _TreeWidgetExampleState extends State<TreeWidgetExample> {
     );
   }
 
-  late final rootNode = TreeNode(
-    id: "root",
-    builder: buildNode,
-    children: [
-      TreeNode(
-        id: "c1",
-        builder: buildNode,
-        children: [
-          TreeLeaf(
-            id: "c1l1",
-            builder: buildLeaf,
-          ),
-          TreeLeaf(
-            id: "c1l2",
-            builder: buildLeaf,
-          ),
-        ],
-      ),
-      TreeLeaf(
-        id: "l1",
-        builder: buildLeaf,
-      ),
-    ],
-  );
-
   CircleIdGen idGen = CircleIdGen();
-  void rebuild_rootNodeDeep(int depth) {
-    setState(() {
-      this.depth = depth;
-      rootNodeDeep = TreeNode(
-        id: "root",
-        builder: buildNode,
-        children: _generateChildren(depth),
-      );
-    });
-  }
-
   int depth = 5;
-  late var rootNodeDeep = TreeNode(
+  late var rootNode = TreeNode(
     id: "root",
     builder: buildNode,
     children: _generateChildren(depth),
   );
 
-  List<TreeNodeAbst> _generateChildren(int depth, [int? max]) {
-    final count = Random().nextInt(3) + (depth / 2).round() + 1;
-    return [for (int i = 0; i < count; i++) _generateChild(depth - 1, depth)];
-  }
+  List<TreeNodeAbst> _generateChildren(int depth, [int? max]) => [
+        _generateChild(depth - 1, depth),
+        _generateChild(depth - 1, depth),
+        _generateChild(depth - 1, depth),
+      ];
 
   TreeNodeAbst _generateChild(int depth, int max) {
     if (depth == 0 || Random().nextDouble() < (1 - depth / max) + .25) {
@@ -132,6 +101,17 @@ VISBILITY - ${visibility.mode}
 
 explicit - ${visibility.explicit}
 """;
+
+  void rebuildRootNodeDeep(int depth) async {
+    setState(() {
+      rootNode = TreeNode(
+        id: "root",
+        builder: buildNode,
+        children: _generateChildren(depth),
+      );
+      this.depth = depth;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +147,7 @@ explicit - ${visibility.explicit}
               child: const Icon(Icons.fullscreen_exit),
             ),
             FloatingActionButton(
-              onPressed: () => rebuild_rootNodeDeep(max(1, depth - 1)),
+              onPressed: () => rebuildRootNodeDeep(max(1, depth - 1)),
               child: const Icon(Icons.remove),
             ),
             Container(
@@ -179,21 +159,14 @@ explicit - ${visibility.explicit}
               child: Text("$depth", style: const TextStyle(color: Colors.black)),
             ),
             FloatingActionButton(
-              onPressed: () => rebuild_rootNodeDeep(depth + 1),
+              onPressed: () => rebuildRootNodeDeep(depth + 1),
               child: const Icon(Icons.add),
             ),
           ],
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TreeWidget(
-                treeNodeRoot: rootNodeDeep,
-                treeVisibility: visibility,
-              ),
-            ],
-          ),
+        body: TreeWidget.fromRootNode(
+          rootNode: rootNode,
+          treeVisibility: visibility,
         ),
       ),
     );
