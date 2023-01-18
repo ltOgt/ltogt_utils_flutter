@@ -21,6 +21,7 @@ class DecoratedScrollable extends StatefulWidget {
     required this.child,
     required this.scrollVertical,
     required this.scrollHorizontal,
+    this.childIsScrollable = false,
     this.buildDecoration = buildDecorationDefault,
     this.controllerHorizontal,
     this.controllerVertical,
@@ -28,7 +29,15 @@ class DecoratedScrollable extends StatefulWidget {
   }) : super(key: key);
 
   /// Sub-tree that should be made scrollable.
+  ///
+  /// (Unless [childIsScrollable])
   final Widget child;
+
+  /// Dont put [child] into [SingleChildScrollView].
+  ///
+  /// Use this when your [child] is a [Scrollable] that
+  /// uses [controllerHorizontal] and/or [controllerVertical].
+  final bool childIsScrollable;
 
   final bool scrollVertical;
   final bool scrollHorizontal;
@@ -175,19 +184,21 @@ class _DecoratedScrollableState extends State<DecoratedScrollable> {
               child: ConditionalParentWidget(
                 condition: widget.centerChild,
                 parentBuilder: (child) => Center(child: child),
-                child: SingleChildScrollView(
-                  scrollDirection: widget.scrollVertical ? Axis.vertical : Axis.horizontal,
-                  controller: widget.scrollVertical ? verticalCtrl : horizontalCtrl,
-                  child: !(widget.scrollVertical && widget.scrollHorizontal) //
-                      ? widget.child
-                      : SingleChildScrollView(
-                          // if two axis, then the previous one is vertical
-                          // if one axis, the previous is the only one with the correct axis
-                          scrollDirection: Axis.horizontal,
-                          controller: horizontalCtrl,
-                          child: widget.child,
-                        ),
-                ),
+                child: widget.childIsScrollable
+                    ? widget.child
+                    : SingleChildScrollView(
+                        scrollDirection: widget.scrollVertical ? Axis.vertical : Axis.horizontal,
+                        controller: widget.scrollVertical ? verticalCtrl : horizontalCtrl,
+                        child: !(widget.scrollVertical && widget.scrollHorizontal) //
+                            ? widget.child
+                            : SingleChildScrollView(
+                                // if two axis, then the previous one is vertical
+                                // if one axis, the previous is the only one with the correct axis
+                                scrollDirection: Axis.horizontal,
+                                controller: horizontalCtrl,
+                                child: widget.child,
+                              ),
+                      ),
               ),
             ),
             // DECORATION
