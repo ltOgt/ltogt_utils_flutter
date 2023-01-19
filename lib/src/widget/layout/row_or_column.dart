@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 /// Easily switch between [Row] and [Column] depending on [axis].
 class RowOrColumn extends StatelessWidget {
   const RowOrColumn({
+    super.key,
     required this.axis,
     this.children,
     this.mainAxisAlignment = MainAxisAlignment.start,
