@@ -31,3 +31,18 @@ class StateComponentScroll extends StateComponent<ScrollController> {
           onDispose: onDispose ?? (v) => v.dispose(),
         );
 }
+
+class StateComponentFocus extends StateComponent<FocusNode> {
+  StateComponentFocus({
+    required super.state,
+    FocusNode Function()? onInit,
+    void Function(FocusNode value)? onDispose,
+    super.onChange,
+    super.setStateOnChange,
+    super.onDidChangeDependencies,
+    super.onDidUpdateWidget,
+  }) : super(
+          onInit: onInit ?? () => FocusNode(),
+          onDispose: onDispose ?? (v) => v.dispose(),
+        );
+}
