@@ -1,12 +1,13 @@
-import 'package:example/example/auto_size_text.dart';
-import 'package:example/example/cached_builder.dart';
-import 'package:example/example/decorated_scrollable.dart';
-import 'package:example/example/file_tree_example.dart';
-import 'package:example/example/line_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
 
+import 'example/auto_size_text.dart';
+import 'example/cached_builder.dart';
+import 'example/decorated_scrollable.dart';
+import 'example/file_tree_example.dart';
+import 'example/line_widget.dart';
 import 'example/disposable_state.dart';
+import 'example/split_page_to_content_example.dart';
 import 'example/state_component.dart';
 import 'example/tree_widget_example.dart';
 
@@ -19,6 +20,7 @@ const Map<String, Widget> examplesNameWidget = {
   "TreeWidgetExample": TreeWidgetExample(),
   "StateComponentExample": StateComponentExample(),
   "DecoratedScrollable": DecoratedScrollableExample(),
+  "SplitPageToContentExample": SplitPageToContentExample(),
 };
 
 void main() {
