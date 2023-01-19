@@ -27,7 +27,10 @@ class ExampleLauncher extends StatelessWidget {
                     showDialog(
                         context: context,
                         builder: (_) {
-                          return example.value;
+                          return Padding(
+                            padding: EdgeInsets.all(30),
+                            child: example.value,
+                          );
                         });
                   },
                   child: SizedBox(
