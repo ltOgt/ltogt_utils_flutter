@@ -6,13 +6,11 @@ import 'example/cached_builder.dart';
 import 'example/decorated_scrollable.dart';
 import 'example/file_tree_example.dart';
 import 'example/line_widget.dart';
-import 'example/disposable_state.dart';
 import 'example/split_page_to_content_example.dart';
 import 'example/state_component.dart';
 import 'example/tree_widget_example.dart';
 
 const Map<String, Widget> examplesNameWidget = {
-  "DisposableStateExample": DisposableStateExample(),
   "LineWidgetExample": LineWidgetExample(),
   "CachedBuilderExample": CachedBuilderExample(),
   "AutoSizeTextExample": AutoSizeTextExample(),
