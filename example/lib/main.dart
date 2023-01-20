@@ -1,3 +1,4 @@
+import 'package:example/example/multi_select_text_example.dart';
 import 'package:flutter/material.dart';
 import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
 
@@ -19,6 +20,7 @@ const Map<String, Widget> examplesNameWidget = {
   "StateComponentExample": StateComponentExample(),
   "DecoratedScrollable": DecoratedScrollableExample(),
   "SplitPageToContentExample": SplitPageToContentExample(),
+  "MultiSelectTextExample": MultiSelectTextExample(),
 };
 
 void main() {

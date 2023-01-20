@@ -22,6 +22,7 @@ export 'src/widget/example/exampleLauncher.dart';
 
 export 'src/widget/text/auto_size_text.dart';
 export 'src/widget/text/measure_text.dart';
+export 'src/widget/text/mulit_select_text.dart';
 
 export 'src/widget/size_helper.dart';
 
