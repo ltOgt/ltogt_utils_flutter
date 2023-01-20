@@ -70,7 +70,7 @@ class RenderHelper {
     return globalKey.currentContext?.findRenderObject();
   }
 
-  static Future get nextFrameFuture async {
+  static Future<void> get nextFrameFuture async {
     Completer completer = Completer();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) => completer.complete());
     await completer.future;
