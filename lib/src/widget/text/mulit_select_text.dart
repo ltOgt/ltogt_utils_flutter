@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -241,6 +243,13 @@ class _MultiSelectTextState extends State<MultiSelectText> {
               }
             },
             child: GestureDetector(
+              supportedDevices: {
+                PointerDeviceKind.invertedStylus,
+                PointerDeviceKind.mouse,
+                PointerDeviceKind.stylus,
+                PointerDeviceKind.touch,
+                //PointerDeviceKind.trackpad  <-- Explicitly not this; trackpad scroll
+              },
               onPanStart: _onPanStart,
               onPanUpdate: _onPanUpdate,
               onPanEnd: _onPanEnd,
