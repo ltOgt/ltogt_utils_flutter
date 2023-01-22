@@ -1,9 +1,15 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
 import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
 
+/// Non-Movement details for
+/// - [TextSpanGestureDetector.onTapUp]
+/// - [TextSpanGestureDetector.onDoubleTapDown]
+/// - [TextSpanGestureDetector.onPanStart]
 class TextSpanDetails {
   /// The current [TextPosition] at time of the event.
   final TextPosition textPosition;
@@ -18,8 +24,14 @@ class TextSpanDetails {
 
   TextSelection get selection => TextSelection.fromPosition(textPosition);
   Rect get rectLocal => offsetLocal & Size.zero;
+
+  @override
+  String toString() => 'TextSpanDetails(textPosition: $textPosition, offsetLocal: $offsetLocal)';
 }
 
+/// Movement details for
+/// - [TextSpanGestureDetector.onPanUpdate]
+/// - [TextSpanGestureDetector.onPanEnd]
 class TextSpanPanDetails extends TextSpanDetails {
   const TextSpanPanDetails({
     required super.textPosition,
@@ -42,8 +54,18 @@ class TextSpanPanDetails extends TextSpanDetails {
 
   @override
   Rect get rectLocal => Rect.fromPoints(offsetLocalStart, offsetLocal);
+
+  @override
+  String toString() =>
+      'TextSpanPanDetails(textPositionStart: $textPositionStart, offsetLocalStart: $offsetLocalStart, textPosition: $textPosition, offsetLocal: $offsetLocal)';
 }
 
+/// [TextPosition] based gesture detection on [textSpan].
+///
+/// Also manages keeping track of initial positions to expose [TextSelection]
+/// for [onPanUpdate] and [onPanEnd].
+///
+/// See [TextSpanDetails] and [TextSpanPanDetails].
 class TextSpanGestureDetector extends StatefulWidget {
   const TextSpanGestureDetector({
     Key? key,
@@ -165,7 +187,7 @@ class _TextSpanGestureDetectorState extends State<TextSpanGestureDetector> {
       onPanStart: hasUpdateOrEnd || widget.onPanStart != null ? onPanStart : null,
       onPanUpdate: hasUpdateOrEnd ? onPanUpdate : null,
       onPanEnd: widget.onPanEnd != null ? onPanEnd : null,
-      onPanCancel: widget.onPanCancel == null ? null : () => widget.onPanCancel!(),
+      onPanCancel: widget.onPanCancel,
       behavior: HitTestBehavior.translucent,
       child: RichText(
         key: _richTextKey,

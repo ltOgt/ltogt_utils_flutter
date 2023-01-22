@@ -1,4 +1,5 @@
 import 'package:example/example/multi_select_text_example.dart';
+import 'package:example/example/text_span_gesture_detector_example.dart';
 import 'package:flutter/material.dart';
 import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
 
@@ -21,6 +22,7 @@ const Map<String, Widget> examplesNameWidget = {
   "DecoratedScrollable": DecoratedScrollableExample(),
   "SplitPageToContentExample": SplitPageToContentExample(),
   "MultiSelectTextExample": MultiSelectTextExample(),
+  "TextSpanGestureDetectorExample": TextSpanGestureDetectorExample(),
 };
 
 void main() {

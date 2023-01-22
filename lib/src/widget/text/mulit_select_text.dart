@@ -232,60 +232,56 @@ class _MultiSelectTextState extends State<MultiSelectText> {
   Widget build(BuildContext context) {
     return ConstraintsChangedNotifier(
       onConstraintsChanged: (_, __) => setState(_storeRectsBySelection),
-      child: Stack(
-        children: [
-          Listener(
-            onPointerUp: (event) {
-              final _hoveredRect = _getRectUnderOffset(event.localPosition);
-              final _textPosition = _getPositionForOffset(event.localPosition);
-              if (_hoveredRect != null) {
-                widget.onTapUpSelection?.call(_textPosition, _hoveredRect);
-              }
-            },
-            child: GestureDetector(
-              supportedDevices: {
-                PointerDeviceKind.invertedStylus,
-                PointerDeviceKind.mouse,
-                PointerDeviceKind.stylus,
-                PointerDeviceKind.touch,
-                //PointerDeviceKind.trackpad  <-- Explicitly not this; trackpad scroll
-              },
-              onPanStart: _onPanStart,
-              onPanUpdate: _onPanUpdate,
-              onPanEnd: _onPanEnd,
-              onPanCancel: _onPanCancel,
-              behavior: HitTestBehavior.translucent,
-              child: Stack(
-                children: [
-                  for (final selection in _rectBySelection.entries)
-                    selection.key.build?.call(selection.value) ??
-                        CustomPaint(
-                          painter: SelectableTextBoxPainter(
-                            color: Colors.blue.withAlpha(100),
-                            rects: selection.value,
-                            fill: true,
-                          ),
-                        ),
-                  if (_ongoingSelectionRects.isNotEmpty)
+      child: Listener(
+        onPointerUp: (event) {
+          final _hoveredRect = _getRectUnderOffset(event.localPosition);
+          final _textPosition = _getPositionForOffset(event.localPosition);
+          if (_hoveredRect != null) {
+            widget.onTapUpSelection?.call(_textPosition, _hoveredRect);
+          }
+        },
+        child: GestureDetector(
+          supportedDevices: {
+            PointerDeviceKind.invertedStylus,
+            PointerDeviceKind.mouse,
+            PointerDeviceKind.stylus,
+            PointerDeviceKind.touch,
+            //PointerDeviceKind.trackpad  <-- Explicitly not this; trackpad scroll
+          },
+          onPanStart: _onPanStart,
+          onPanUpdate: _onPanUpdate,
+          onPanEnd: _onPanEnd,
+          onPanCancel: _onPanCancel,
+          behavior: HitTestBehavior.translucent,
+          child: Stack(
+            children: [
+              for (final selection in _rectBySelection.entries)
+                selection.key.build?.call(selection.value) ??
                     CustomPaint(
                       painter: SelectableTextBoxPainter(
                         color: Colors.blue.withAlpha(100),
-                        rects: _ongoingSelectionRects,
+                        rects: selection.value,
                         fill: true,
                       ),
                     ),
-                  RichText(
-                    key: _richTextKey,
-                    text: TextSpan(
-                      style: const TextStyle(color: Colors.black),
-                      children: [widget.textSpan],
-                    ),
+              if (_ongoingSelectionRects.isNotEmpty)
+                CustomPaint(
+                  painter: SelectableTextBoxPainter(
+                    color: Colors.blue.withAlpha(100),
+                    rects: _ongoingSelectionRects,
+                    fill: true,
                   ),
-                ],
+                ),
+              RichText(
+                key: _richTextKey,
+                text: TextSpan(
+                  style: const TextStyle(color: Colors.black),
+                  children: [widget.textSpan],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
