@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:ltogt_utils_flutter/src/widget/null_widget.dart';
 
 /// Wrapper for any object that needs to be initialized or disposed along with the state.
 ///
@@ -186,4 +187,15 @@ abstract class ComponentState<T extends StatefulWidget> extends State<T> {
     }
     super.dispose();
   }
+}
+
+abstract class ComponentController extends ChangeNotifier {
+  void notify(VoidCallback c) {
+    c();
+    notifyListeners();
+  }
+
+  Widget build() => NullWidget();
+
+  String? get label => null;
 }
