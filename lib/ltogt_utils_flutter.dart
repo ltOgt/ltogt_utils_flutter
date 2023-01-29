@@ -37,6 +37,8 @@ export 'src/widget/positioned_on_edge_x.dart';
 
 export 'src/widget/null_widget.dart';
 
+export 'src/widget/inverted_colors.dart';
+
 export 'src/state/model/stateful_model.dart';
 export 'src/state/model/m_prop.dart';
 
