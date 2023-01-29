@@ -61,14 +61,14 @@ class _MyWidgetState extends ComponentState<MyWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () => scrollController.value.animateTo(
+        onPressed: () => scrollController.obj.animateTo(
           0,
           duration: const Duration(milliseconds: 200),
           curve: Curves.bounceIn,
         ),
       ),
       body: ListView.builder(
-        controller: scrollController.value,
+        controller: scrollController.obj,
         itemCount: 100,
         itemBuilder: (c, i) => Container(
           margin: const EdgeInsets.all(8),
