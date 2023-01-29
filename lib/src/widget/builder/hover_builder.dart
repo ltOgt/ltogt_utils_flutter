@@ -3,11 +3,14 @@ import 'package:flutter/widgets.dart';
 class HoverBuilder extends StatefulWidget {
   const HoverBuilder({
     Key? key,
-    required this.builder,
+    this.builder,
+    this.builderWithEvent,
     this.opaque = false,
-  }) : super(key: key);
+  })  : assert((builder == null) != (builderWithEvent == null)),
+        super(key: key);
 
-  final Widget Function(bool isHovering) builder;
+  final Widget Function(bool isHovering)? builder;
+  final Widget Function(bool isHovering, PointerEvent? e)? builderWithEvent;
   final bool opaque;
 
   @override
@@ -16,6 +19,7 @@ class HoverBuilder extends StatefulWidget {
 
 class HoverBuilderState extends State<HoverBuilder> {
   bool isHovering = false;
+  PointerEvent? _event;
 
   @override
   Widget build(BuildContext context) {
@@ -23,11 +27,20 @@ class HoverBuilderState extends State<HoverBuilder> {
       opaque: widget.opaque,
       onEnter: (e) => setState(() {
         isHovering = true;
+        _event = e;
       }),
+      onHover: widget.builderWithEvent == null
+          ? null
+          : (e) {
+              setState(() {
+                _event = e;
+              });
+            },
       onExit: (e) => setState(() {
         isHovering = false;
+        _event = e;
       }),
-      child: widget.builder(isHovering),
+      child: widget.builder?.call(isHovering) ?? widget.builderWithEvent?.call(isHovering, _event),
     );
   }
 }
