@@ -7,6 +7,7 @@ export 'src/widget/builder/change_notifier_builder.dart';
 export 'src/widget/builder/widget_list_generator.dart';
 export 'src/widget/builder/hover_builder.dart';
 export 'src/widget/builder/cached_builder.dart';
+export 'src/widget/builder/focus_builder.dart';
 
 export 'src/widget/future/future_switch.dart';
 
