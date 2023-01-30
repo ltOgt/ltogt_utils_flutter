@@ -42,8 +42,10 @@ class _FocusBuilderState extends ComponentState<FocusBuilder> {
   void didUpdateWidget(covariant FocusBuilder oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    _dispose(oldWidget);
-    _init();
+    if (oldWidget.focusNode != widget.focusNode) {
+      _dispose(oldWidget);
+      _init();
+    }
   }
 
   @override
