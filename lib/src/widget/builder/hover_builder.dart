@@ -23,24 +23,30 @@ class HoverBuilderState extends State<HoverBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      opaque: widget.opaque,
-      onEnter: (e) => setState(() {
+    return Listener(
+      onPointerUp: (e) => setState(() {
         isHovering = true;
         _event = e;
       }),
-      onHover: widget.builderWithEvent == null
-          ? null
-          : (e) {
-              setState(() {
-                _event = e;
-              });
-            },
-      onExit: (e) => setState(() {
-        isHovering = false;
-        _event = e;
-      }),
-      child: widget.builder?.call(isHovering) ?? widget.builderWithEvent?.call(isHovering, _event),
+      child: MouseRegion(
+        opaque: widget.opaque,
+        onEnter: (e) => setState(() {
+          isHovering = true;
+          _event = e;
+        }),
+        onHover: widget.builderWithEvent == null
+            ? null
+            : (e) {
+                setState(() {
+                  _event = e;
+                });
+              },
+        onExit: (e) => setState(() {
+          isHovering = false;
+          _event = e;
+        }),
+        child: widget.builder?.call(isHovering) ?? widget.builderWithEvent?.call(isHovering, _event),
+      ),
     );
   }
 }
