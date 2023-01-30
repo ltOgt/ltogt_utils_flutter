@@ -6,10 +6,12 @@ class FocusBuilder extends StatefulWidget {
     Key? key,
     required this.builder,
     this.focusNode,
+    this.includeFocus = false,
   }) : super(key: key);
 
   final Widget Function(FocusNode focusNode) builder;
   final FocusNode? focusNode;
+  final bool includeFocus;
 
   @override
   State<FocusBuilder> createState() => _FocusBuilderState();
@@ -56,8 +58,9 @@ class _FocusBuilderState extends ComponentState<FocusBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    return Focus(
-      focusNode: focusNode,
+    return ConditionalParentWidget(
+      condition: widget.includeFocus,
+      parentBuilder: (c) => Focus(focusNode: focusNode, child: c),
       child: widget.builder(focusNode),
     );
   }
