@@ -28,6 +28,14 @@ class HoverBuilderState extends State<HoverBuilder> {
         isHovering = true;
         _event = e;
       }),
+      onPointerDown: (e) => setState(() {
+        isHovering = true;
+        _event = e;
+      }),
+      onPointerMove: (e) => setState(() {
+        isHovering = true; // TODO need to check if still is in bounds
+        _event = e;
+      }),
       child: MouseRegion(
         opaque: widget.opaque,
         onEnter: (e) => setState(() {
