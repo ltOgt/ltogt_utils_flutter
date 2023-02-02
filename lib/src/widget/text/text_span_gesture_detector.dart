@@ -76,11 +76,13 @@ class TextSpanGestureDetector extends StatefulWidget {
     this.onPanUpdate,
     this.onPanEnd,
     this.onPanCancel,
+    this.onTapDown,
   }) : super(key: key);
 
   /// The text that should be interactable
   final TextSpan textSpan;
 
+  final void Function(TextSpanDetails)? onTapDown;
   final void Function(TextSpanDetails)? onTapUp;
   final void Function(TextSpanDetails)? onDoubleTapDown;
   final void Function(TextSpanDetails)? onPanStart;
@@ -172,6 +174,12 @@ class _TextSpanGestureDetectorState extends State<TextSpanGestureDetector> {
         PointerDeviceKind.touch,
         //PointerDeviceKind.trackpad  <-- Explicitly not this; trackpad scroll
       },
+      onTapDown: widget.onTapDown == null
+          ? null
+          : (e) => widget.onTapUp!(TextSpanDetails(
+                textPosition: _getPositionForOffset(e.localPosition),
+                offsetLocal: e.localPosition,
+              )),
       onTapUp: widget.onTapUp == null
           ? null
           : (e) => widget.onTapUp!(TextSpanDetails(
