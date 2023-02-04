@@ -40,6 +40,8 @@ export 'src/widget/null_widget.dart';
 
 export 'src/widget/inverted_colors.dart';
 
+export 'src/widget/clip/custom_clip_rect.dart';
+
 export 'src/state/model/stateful_model.dart';
 export 'src/state/model/m_prop.dart';
 
