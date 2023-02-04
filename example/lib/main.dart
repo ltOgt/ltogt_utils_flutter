@@ -5,6 +5,7 @@ import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
 
 import 'example/auto_size_text.dart';
 import 'example/cached_builder.dart';
+import 'example/custom_slider_example.dart';
 import 'example/decorated_scrollable.dart';
 import 'example/file_tree_example.dart';
 import 'example/line_widget.dart';
@@ -23,6 +24,7 @@ const Map<String, Widget> examplesNameWidget = {
   "SplitPageToContentExample": SplitPageToContentExample(),
   "MultiSelectTextExample": MultiSelectTextExample(),
   "TextSpanGestureDetectorExample": TextSpanGestureDetectorExample(),
+  "CustomSliderExample": CustomSliderExample(),
 };
 
 void main() {

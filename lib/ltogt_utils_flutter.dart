@@ -47,6 +47,8 @@ export 'src/widget/inverted_colors/inverted_color_focusable.dart';
 
 export 'src/widget/clip/custom_clip_rect.dart';
 
+export 'src/widget/custom_slider.dart';
+
 export 'src/state/model/stateful_model.dart';
 export 'src/state/model/m_prop.dart';
 
