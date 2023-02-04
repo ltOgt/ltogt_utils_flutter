@@ -38,7 +38,10 @@ export 'src/widget/positioned_on_edge_x.dart';
 
 export 'src/widget/null_widget.dart';
 
-export 'src/widget/inverted_colors.dart';
+export 'src/widget/inverted_colors/inverted_colors.dart';
+export 'src/widget/inverted_colors/inverted_colors_clip_stack.dart';
+export 'src/widget/inverted_colors/inverted_color_pointer.dart';
+export 'src/widget/inverted_colors/inverted_color_focusable.dart';
 
 export 'src/widget/clip/custom_clip_rect.dart';
 

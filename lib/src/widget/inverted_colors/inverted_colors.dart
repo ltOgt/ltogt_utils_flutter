@@ -19,6 +19,8 @@ class InvertedColors extends StatelessWidget {
     0, 0, -1, 0, 255, //
     0, 0, 0, 1, 0
   ]);
+
+  /// See [ColorFilter] documentation example
   static const ColorFilter identity = ColorFilter.matrix(<double>[
     1, 0, 0, 0, 0, //
     0, 1, 0, 0, 0, //
