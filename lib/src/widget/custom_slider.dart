@@ -87,8 +87,8 @@ class SliderConfig {
     required this.minValue,
     required this.maxValue,
     required this.sliderMainAxisSize,
-    required this.handleMainAxisSize,
     required this.sliderCrossAxisSize,
+    required this.handleMainAxisSize,
     required this.handleCrossAxisSize,
     required this.axisDirection,
   });
