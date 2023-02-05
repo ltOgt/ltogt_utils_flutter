@@ -35,8 +35,6 @@ export 'src/widget/tree_widget.dart';
 export 'src/widget/overlay_manager.dart';
 
 export 'src/widget/decorated_scrollable.dart';
-export 'src/widget/positioned_on_edge_x.dart';
-export 'src/widget/positioned_directional_x.dart';
 
 export 'src/widget/null_widget.dart';
 
@@ -62,3 +60,7 @@ export 'src/state/component/default_components/text.dart';
 export 'src/device/device_type.dart';
 
 export 'src/color_helper.dart';
+
+export 'src/extensions/positioned_on_edge_x.dart';
+export 'src/extensions/positioned_directional_x.dart';
+export 'src/extensions/axis_x.dart';
