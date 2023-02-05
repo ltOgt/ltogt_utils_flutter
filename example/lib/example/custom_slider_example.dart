@@ -25,13 +25,14 @@ class CustomSliderExample extends StatefulWidget {
 }
 
 class _CustomSliderExampleState extends State<CustomSliderExample> {
-  static const SliderConfig sliderConfig = SliderConfig(
+  SliderConfig sliderConfig = const SliderConfig(
     minValue: -100,
     maxValue: 100,
     sliderMainAxisSize: 200,
     sliderCrossAxisSize: 40,
     handleMainAxisSize: 40,
     handleCrossAxisSize: 40,
+    axisDirection: AxisDirection.right,
   );
 
   double value = 0;
@@ -44,7 +45,6 @@ class _CustomSliderExampleState extends State<CustomSliderExample> {
         color: Colors.grey,
         child: Center(
           child: CustomSlider(
-            axisDirection: direction,
             value: value,
             sliderConfig: sliderConfig,
             handle: Container(
@@ -82,10 +82,16 @@ class _CustomSliderExampleState extends State<CustomSliderExample> {
       ? BorderRadius.all(Radius.circular(sliderConfig.handleCrossAxisSize))
       : null;
 
-  AxisDirection direction = AxisDirection.right;
-  void nextDirection() => setState(() {
-        direction = AxisDirection.values[(direction.index + 1) % AxisDirection.values.length];
-      });
+  AxisDirection get direction => sliderConfig.axisDirection;
+  void nextDirection() {
+    final nextDirection = AxisDirection.values[(direction.index + 1) % AxisDirection.values.length];
+    setState(() {
+      sliderConfig = sliderConfig.copyWith(
+        axisDirection: nextDirection,
+      );
+    });
+  }
+
   IconData get directionIcon {
     switch (direction) {
       case AxisDirection.up:

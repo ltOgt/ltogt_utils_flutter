@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:ltogt_utils_flutter/src/extensions/positioned_on_edge_x.dart';
 import 'package:ltogt_utils_flutter/src/widget/builder/conditional_parent_widget.dart';
-import 'package:ltogt_utils_flutter/src/widget/positioned_on_edge_x.dart';
 
 class DecoratedScrollableDetails {
   final ScrollMetrics metrics;
