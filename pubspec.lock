@@ -70,11 +70,9 @@ packages:
   ltogt_utils:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "4cb4d288c4115b0884fb2c401d45ac122e8a72da"
-      url: "git@github.com:ltOgt/ltogt_utils.git"
-    source: git
+      path: "../ltogt_utils"
+      relative: true
+    source: path
     version: "0.0.4"
   matcher:
     dependency: transitive
