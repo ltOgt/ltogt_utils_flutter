@@ -151,16 +151,19 @@ class TreeWidget extends StatelessWidget {
     super.key,
     required this.treeData,
     this.itemExtent,
+    this.scrollController,
   });
 
   final TreeDataAbst treeData;
   final double? itemExtent;
+  final ScrollController? scrollController;
 
   static TreeWidget fromRootNode({
     Key? key,
     required TreeNodeAbst rootNode,
     required TreeVisibility treeVisibility,
     double? itemExtent,
+    ScrollController? scrollController,
   }) =>
       TreeWidget(
         key: key,
@@ -169,11 +172,13 @@ class TreeWidget extends StatelessWidget {
           root: rootNode,
           treeVisibility: treeVisibility,
         ),
+        scrollController: scrollController,
       );
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      controller: scrollController,
       itemCount: treeData.list.length,
       itemExtent: itemExtent,
       itemBuilder: (c, i) {
