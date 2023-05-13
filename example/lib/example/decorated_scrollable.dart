@@ -13,49 +13,86 @@ class DecoratedScrollableExample extends StatefulWidget {
 }
 
 class _DecoratedScrollableExampleState extends State<DecoratedScrollableExample> {
-  int counter = 0;
+  int numPerDimension = 2;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Cached Builder Example',
+      title: 'Decorated Scrollable Example',
       home: Scaffold(
         backgroundColor: Colors.black,
-        body: DecoratedScrollable(
-          scrollHorizontal: true,
-          scrollVertical: true,
-          child: Column(
-            children: ListGenerator.forRange(
-              to: 40,
-              generator: (i) => SizedBox(
-                height: 100,
-                child: Row(
-                    children: ListGenerator.forRange(
-                  to: 40,
-                  generator: (j) => Container(
-                    width: 100,
+        floatingActionButton: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.blueAccent),
+          ),
+          child: CustomSlider(
+            value: numPerDimension.toDouble(),
+            sliderConfig: const SliderConfig(
+              minValue: 0,
+              maxValue: 50,
+              sliderMainAxisSize: 100,
+              sliderCrossAxisSize: 10,
+              handleMainAxisSize: 10,
+              handleCrossAxisSize: 10,
+              axisDirection: AxisDirection.right,
+            ),
+            handle: Container(color: Colors.white),
+            sliderBefore: Container(color: Colors.grey),
+            sliderAfter: Container(color: Colors.black),
+            onUpdateValue: (value) => setState(() {
+              numPerDimension = value.round();
+            }),
+          ),
+        ),
+        body: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.white),
+          ),
+          child: DecoratedScrollable(
+            scrollHorizontal: true,
+            scrollVertical: true,
+            // axis: Axis.vertical,
+            // maxAxisSize: 10000,
+            child: SizedBox(
+              height: 100.0 * numPerDimension,
+              width: 100.0 * numPerDimension,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: ListGenerator.forRange(
+                  to: numPerDimension,
+                  generator: (i) => SizedBox(
                     height: 100,
-                    color: (i + j) % 2 == 0 ? Colors.white : Colors.blue,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: ListGenerator.forRange(
+                        to: numPerDimension,
+                        generator: (j) => Container(
+                          width: 100,
+                          height: 100,
+                          color: (i + j) % 2 == 0 ? Colors.white : Colors.blue,
+                        ),
+                      ),
+                    ),
                   ),
-                )),
+                ),
               ),
             ),
+            buildDecoration: (v, h) {
+              return Stack(
+                children: [
+                  Positioned.fill(child: DecoratedScrollable.buildDecorationDefault(v, h)),
+                  if (v != null) ...[
+                    PositionedOnEdgeX.top(child: _Circle(distance: v.metrics.extentBefore)),
+                    PositionedOnEdgeX.bottom(child: _Circle(distance: v.metrics.extentAfter)),
+                  ],
+                  if (h != null) ...[
+                    PositionedOnEdgeX.left(child: _Circle(distance: h.metrics.extentBefore)),
+                    PositionedOnEdgeX.right(child: _Circle(distance: h.metrics.extentAfter)),
+                  ],
+                ],
+              );
+            },
           ),
-          buildDecoration: (v, h) {
-            return Stack(
-              children: [
-                Positioned.fill(child: DecoratedScrollable.buildDecorationDefault(v, h)),
-                if (v != null) ...[
-                  PositionedOnEdgeX.top(_Circle(distance: v.metrics.extentBefore)),
-                  PositionedOnEdgeX.bottom(_Circle(distance: v.metrics.extentAfter)),
-                ],
-                if (h != null) ...[
-                  PositionedOnEdgeX.left(_Circle(distance: h.metrics.extentBefore)),
-                  PositionedOnEdgeX.right(_Circle(distance: h.metrics.extentAfter)),
-                ],
-              ],
-            );
-          },
         ),
       ),
     );

@@ -25,7 +25,7 @@ class DecoratedScrollable extends StatefulWidget {
     this.buildDecoration = buildDecorationDefault,
     this.controllerHorizontal,
     this.controllerVertical,
-    this.centerChild = false,
+    this.alignment = AlignmentDirectional.center,
   }) : super(key: key);
 
   /// Sub-tree that should be made scrollable.
@@ -47,7 +47,7 @@ class DecoratedScrollable extends StatefulWidget {
   final ScrollController? controllerVertical;
   final ScrollController? controllerHorizontal;
 
-  final bool centerChild;
+  final AlignmentDirectional? alignment;
 
   @override
   State<DecoratedScrollable> createState() => _DecoratedScrollableState();
@@ -62,7 +62,7 @@ class DecoratedScrollable extends StatefulWidget {
         // Vertical
         if (v != null && v.isBefore) //
           PositionedOnEdgeX.top(
-            Container(
+            child: Container(
               decoration: BoxDecoration(boxShadow: [shadow]),
               height: 1,
               width: double.infinity,
@@ -70,7 +70,7 @@ class DecoratedScrollable extends StatefulWidget {
           ),
         if (v != null && v.isAfter) //
           PositionedOnEdgeX.bottom(
-            Container(
+            child: Container(
               decoration: BoxDecoration(boxShadow: [shadow]),
               height: 1,
               width: double.infinity,
@@ -79,7 +79,7 @@ class DecoratedScrollable extends StatefulWidget {
         // Horizontal
         if (h != null && h.isBefore) //
           PositionedOnEdgeX.left(
-            Container(
+            child: Container(
               decoration: BoxDecoration(boxShadow: [shadow]),
               width: 1,
               height: double.infinity,
@@ -87,7 +87,7 @@ class DecoratedScrollable extends StatefulWidget {
           ),
         if (h != null && h.isAfter) //
           PositionedOnEdgeX.right(
-            Container(
+            child: Container(
               decoration: BoxDecoration(boxShadow: [shadow]),
               width: 1,
               height: double.infinity,
@@ -182,8 +182,11 @@ class _DecoratedScrollableState extends State<DecoratedScrollable> {
             // CONTENT
             Positioned.fill(
               child: ConditionalParentWidget(
-                condition: widget.centerChild,
-                parentBuilder: (child) => Center(child: child),
+                condition: widget.alignment != null,
+                parentBuilder: (child) => Align(
+                  alignment: widget.alignment!,
+                  child: child,
+                ),
                 child: widget.childIsScrollable
                     ? widget.child
                     : SingleChildScrollView(
