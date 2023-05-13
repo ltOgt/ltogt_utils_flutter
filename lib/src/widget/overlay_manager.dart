@@ -20,10 +20,6 @@ class OverlayManager {
     if (isVisible) return;
 
     final overlay = Overlay.of(context);
-    if (overlay == null) {
-      assert(false, "No overlay found");
-      return;
-    }
 
     overlay.insert(_entry);
     isVisible = true;
