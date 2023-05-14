@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:ltogt_utils_flutter/src/state/component/state_component.dart';
 
-class StateComponentFocus extends StateComponent<FocusNode> {
+class StateComponentFocus<W extends StatefulWidget> extends StateComponent<FocusNode, W> {
   StateComponentFocus({
     required super.state,
     FocusNode Function()? onInit,

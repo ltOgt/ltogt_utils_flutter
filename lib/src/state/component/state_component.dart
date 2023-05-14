@@ -23,13 +23,14 @@ import 'package:ltogt_utils_flutter/src/widget/null_widget.dart';
 ///   build(c) => ...;
 /// }
 /// ```
-class StateComponent<T> {
-  final ComponentState state;
+class StateComponent<T, W extends StatefulWidget> {
+  final ComponentState<W> state;
 
   /// The instance of the object [T] wrapped by this component
   ///
   /// E.g. ScrollController
-  T? _obj;
+  late T _obj;
+  bool _initialized = false;
 
   /// Returns the wrapped instance of [T]
   @Deprecated("Use obj instead: Confusing with e.g. text controllers: _txt.value.value")
@@ -38,20 +39,21 @@ class StateComponent<T> {
   T get obj {
     /// [init()] will be called by [ComponentState].
     /// It is also legal to only execute after initState via didChangeDependencies
-    if (_obj == null) {
+    if (!_initialized) {
       _didChangeDependencies();
     }
-    if (_obj == null) {
+    if (!_initialized) {
       throw StateError("value not initialized! call init()");
     }
-    return _obj!;
+    return _obj;
   }
 
   StateComponent({
     required T Function()? onInit,
     required void Function(T obj) onDispose,
-    T? Function(T? obj)? onDidChangeDependencies,
-    T? Function(Widget oldWidget)? onDidUpdateWidget,
+    // current will not be initialized if onInit is null
+    T Function(T? currentIfInitialized)? onDidChangeDependencies,
+    T Function(W oldWidget, T current)? onDidUpdateWidget,
     required this.state,
     this.setStateOnChange = false,
     this.onChange,
@@ -69,9 +71,9 @@ class StateComponent<T> {
   /// Callback to dispose [T]
   final void Function(T obj) _onDispose;
 
-  final T? Function(T? obj)? _onDidChangeDependecies;
+  final T Function(T? current)? _onDidChangeDependecies;
 
-  final T? Function(Widget oldWidget)? _onDidUpdateWidget;
+  final T Function(W oldWidget, T current)? _onDidUpdateWidget;
 
   /// Requires [T] is [Listenable].
   /// Adds listener that calls [state.setState].
@@ -90,8 +92,11 @@ class StateComponent<T> {
   /// It is legal to use [_onDidChangeDependecies] instead.
   /// In that case the first call of [_onDidChangeDependecies] must return a non-null value.
   void _init() {
-    _obj = _onInit?.call();
-    _listenIfWanted();
+    if (_onInit != null) {
+      _obj = _onInit!();
+      _initialized = true;
+      _listenIfWanted();
+    }
   }
 
   void _onChange() {
@@ -105,49 +110,64 @@ class StateComponent<T> {
   bool get shouldListen => setStateOnChange || onChange != null;
   bool _listening = false;
   void _listenIfWanted() {
-    if (!_listening && shouldListen && _obj != null && _obj is Listenable) {
+    if (_initialized && !_listening && shouldListen && _obj is Listenable) {
       (_obj as Listenable).addListener(_onChange);
+    }
+  }
+
+  void _stopListening() {
+    if (_listening) {
+      (_obj as Listenable).removeListener(_onChange);
+      _listening = false;
     }
   }
 
   /// Called by [StateComponent]
   void _didChangeDependencies() {
-    _obj = _onDidChangeDependecies?.call(_obj) ?? _obj;
-    _listenIfWanted();
-    assert(
-      _obj != null,
-      "If _init is not provided, the _value will be null on the first call of _didChangeDependencies\n"
-      "In this case, the first call to _onDidChangeDependecies must return a non-null value",
-    );
+    if (_onDidChangeDependecies != null) {
+      print("before");
+      final _c = _initialized ? _obj : null;
+      print("after");
+      _obj = _onDidChangeDependecies!(_c);
+      _initialized = true;
+      if (!identical(_c, _obj)) {
+        _stopListening();
+        _listenIfWanted();
+      }
+    }
+
+    assert(_initialized);
   }
 
   /// Called by [StateComponent]
-  void _didUpdateWidget(Widget oldWidget) {
-    _obj = _onDidUpdateWidget?.call(oldWidget) ?? _obj;
+  void _didUpdateWidget(W oldWidget) {
+    assert(_initialized);
+    if (_onDidUpdateWidget != null) {
+      final _c = obj;
+      _obj = _onDidUpdateWidget!(oldWidget, _c);
+      if (!identical(_c, _obj)) {
+        _stopListening();
+        _listenIfWanted();
+      }
+    }
   }
 
   /// Called by [StateComponent]
   void _dispose() {
-    if (_obj == null) throw StateError("value not initialiuzed! call init()");
+    if (!_initialized) throw StateError("value not initialized! call init()");
 
-    if (_listening) {
-      (_obj as Listenable).removeListener(_onChange);
-      _listening = false;
-    }
+    _stopListening();
 
-    // ignore: null_check_on_nullable_type_parameter
-    _onDispose(_obj!);
+    _onDispose(_obj);
   }
 
   @override
   bool operator ==(covariant StateComponent other) {
-    if (identical(this, other)) return true;
-
-    return other._obj == _obj;
+    return identical(this, other) || other._obj == _obj;
   }
 
   @override
-  int get hashCode => _obj.hashCode;
+  int get hashCode => !_initialized ? super.hashCode : _obj.hashCode;
 }
 
 /// Replacement for [State] to be used together with [StatefulWidget].

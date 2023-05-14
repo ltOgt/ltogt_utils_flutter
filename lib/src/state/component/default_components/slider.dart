@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:ltogt_utils_flutter/src/state/component/state_component.dart';
 
-class StateComponentSlider extends StateComponent<SliderController> {
+class StateComponentSlider<W extends StatefulWidget> extends StateComponent<SliderController, W> {
   StateComponentSlider({
     required super.state,
     SliderController Function()? onInit,

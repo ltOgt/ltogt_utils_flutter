@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:ltogt_utils_flutter/src/state/component/state_component.dart';
 
-class StateComponentText extends StateComponent<TextEditingController> {
+class StateComponentText<W extends StatefulWidget> extends StateComponent<TextEditingController, W> {
   StateComponentText({
     required super.state,
     TextEditingController Function()? onInit,

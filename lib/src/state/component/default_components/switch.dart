@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:ltogt_utils_flutter/ltogt_utils_flutter.dart';
 
-class StateComponentSwitch<T> extends StateComponent<SwitchController<T>> {
+class StateComponentSwitch<T, W extends StatefulWidget> extends StateComponent<SwitchController<T>, W> {
   StateComponentSwitch({
     required super.state,
     required SwitchController<T> Function()? onInit,

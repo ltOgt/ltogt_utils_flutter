@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:ltogt_utils_flutter/src/state/component/state_component.dart';
 
-class StateComponentScroll extends StateComponent<ScrollController> {
+class StateComponentScroll<W extends StatefulWidget> extends StateComponent<ScrollController, W> {
   StateComponentScroll({
     required super.state,
     ScrollController Function()? onInit,
