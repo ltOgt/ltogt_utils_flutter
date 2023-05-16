@@ -52,7 +52,7 @@ class StateComponent<T, W extends StatefulWidget> {
     required T Function()? onInit,
     required void Function(T obj) onDispose,
     // current will not be initialized if onInit is null
-    T Function(T? currentIfInitialized)? onDidChangeDependencies,
+    T Function(T currentIfInitialized)? onDidChangeDependencies,
     T Function(W oldWidget, T current)? onDidUpdateWidget,
     required this.state,
     this.setStateOnChange = false,
@@ -71,7 +71,7 @@ class StateComponent<T, W extends StatefulWidget> {
   /// Callback to dispose [T]
   final void Function(T obj) _onDispose;
 
-  final T Function(T? current)? _onDidChangeDependecies;
+  final T Function(T currentIfInitialized)? _onDidChangeDependecies;
 
   final T Function(W oldWidget, T current)? _onDidUpdateWidget;
 
@@ -125,10 +125,12 @@ class StateComponent<T, W extends StatefulWidget> {
   /// Called by [StateComponent]
   void _didChangeDependencies() {
     if (_onDidChangeDependecies != null) {
-      print("before");
+      /// we cant reference _obj if its not initialized
+      /// thats why we compare against null instead
+      /// but we still pass _obj to the caller,
+      /// who must handle late init errors if no init() was given
       final _c = _initialized ? _obj : null;
-      print("after");
-      _obj = _onDidChangeDependecies!(_c);
+      _obj = _onDidChangeDependecies!(_obj);
       _initialized = true;
       if (!identical(_c, _obj)) {
         _stopListening();
