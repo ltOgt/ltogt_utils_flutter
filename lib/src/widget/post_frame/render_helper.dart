@@ -53,6 +53,9 @@ class RenderHelper {
   /// Returns null if the widget has no context or no RenderBox.
   ///
   /// Typically called in [initState] with [WidgetsBinding.instance?.addPostFrameCallback]
+  ///
+  /// NOTE:
+  /// See [getRectWithSafeArea] when used under [SafeArea]
   static Rect? getRect({required GlobalKey globalKey}) {
     if (globalKey.currentContext == null) {
       return null;
@@ -74,5 +77,42 @@ class RenderHelper {
     Completer completer = Completer();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) => completer.complete());
     await completer.future;
+  }
+
+  /// Adjust [getRect] to provide expected [Rect] under [SafeArea].
+  ///
+  /// In case you use [SafeArea], the returned [Rect] may be not be in line with
+  /// the applications coordinate system deeper in the tree
+  /// (such as in an [Overlay]).
+  ///
+  /// `MediaQuery.of(context).padding` will probably be [EdgeInsets.zero]
+  /// if queried from a context below [SafeArea] (which overwrites this padding).
+  ///
+  /// In this case you may need to cache one of two things ABOVE the [SafeArea]
+  /// - the actual [EdgeInsets] from [MediaQuery] with a context above [SafeArea]
+  /// - a [rootContext] above, which can then be used to get the correct padding.
+  static ({Rect? rect, Size screenSize}) getRectWithSafeArea({
+    required GlobalKey globalKey,
+    required BuildContext rootContext,
+  }) {
+    final data = MediaQuery.of(rootContext);
+    final padding = data.padding;
+
+    final adjustedScreenSize = Size(
+      data.size.width - padding.horizontal,
+      data.size.height - padding.vertical,
+    );
+
+    final rect = getRect(globalKey: globalKey);
+
+    if (rect == null) {
+      return (rect: null, screenSize: adjustedScreenSize);
+    }
+
+    final adjustedRect = rect.shift(
+      -Offset(padding.left, padding.top),
+    );
+
+    return (rect: adjustedRect, screenSize: adjustedScreenSize);
   }
 }
