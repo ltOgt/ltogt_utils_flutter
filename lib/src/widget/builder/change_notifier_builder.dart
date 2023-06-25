@@ -7,6 +7,7 @@ class ChangeNotifierBuilder<E extends ChangeNotifier> extends StatefulWidget {
     required this.notifier,
     required this.builder,
     this.watch,
+    this.onChanged,
   });
 
   final E notifier;
@@ -16,6 +17,8 @@ class ChangeNotifierBuilder<E extends ChangeNotifier> extends StatefulWidget {
   /// If this is empty, [builder] is called on every notification from [notifier]
   // TODO evaluate whether this actually does anything positive performancewise
   final List<dynamic Function()>? watch;
+
+  final void Function(E notifier)? onChanged;
 
   @override
   _ChangeNotifierBuilderState createState() => _ChangeNotifierBuilderState();
@@ -36,13 +39,18 @@ class _ChangeNotifierBuilderState extends State<ChangeNotifierBuilder> {
     return widget.watch!.map((e) => e.call()).toList();
   }
 
+  void _rebuild(VoidCallback c) {
+    setState(c);
+    widget.onChanged?.call(widget.notifier);
+  }
+
   update() {
     if (rebuildValues == null) {
-      setState(() {});
+      _rebuild(() {});
     } else {
       List _rebuildValues = requestRebuildValues();
       if (false == listEquals(rebuildValues, _rebuildValues)) {
-        setState(() {
+        _rebuild(() {
           rebuildValues = _rebuildValues;
         });
       }
