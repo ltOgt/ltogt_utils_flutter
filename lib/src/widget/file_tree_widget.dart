@@ -84,6 +84,19 @@ class FileTreeWidgetStyle {
     this.directoryRowStyle = const FileTreeEntryStyle(),
   });
 
+  const FileTreeWidgetStyle.uniform({
+    this.childInsetLeft = 14,
+    this.rowHeight = 20,
+    this.iconWidth = 14,
+    this.iconToTextGapWidth = 4,
+    this.iconPadding = const EdgeInsets.symmetric(vertical: 2),
+    this.textPadding = const EdgeInsets.symmetric(vertical: 2),
+    FileTreeEntryStyle entryStyle = const FileTreeEntryStyle(),
+  })  : this.openFileRowStyle = entryStyle,
+        this.fileRowStyle = entryStyle,
+        this.expandedDirectoryRowStyle = entryStyle,
+        this.directoryRowStyle = entryStyle;
+
   // --------------------------------------------------------------------------- Resolve actual style to be used
   // ........................................................................... background
   Color _resolveBgColor(bool isOpen, FileTreeEntryStyle active, FileTreeEntryStyle inactive) => (isOpen) //

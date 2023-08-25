@@ -61,6 +61,7 @@ export 'src/state/component/default_components/slider.dart';
 export 'src/state/component/default_components/switch.dart';
 export 'src/state/component/default_components/text.dart';
 export 'src/state/component/default_components/page.dart';
+export 'src/state/component/default_components/transform.dart';
 
 export 'src/device/device_type.dart';
 
