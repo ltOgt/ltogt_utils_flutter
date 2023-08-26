@@ -30,20 +30,23 @@ class _ClipDraggerState extends State<ClipDragger> {
 
   final _key = GlobalKey();
 
+  void onPosition(Offset localPosition) {
+    final size = RenderHelper.getSize(globalKey: _key)!;
+    setState(
+      () => _fraction = NumHelper.bounded(
+        localPosition.dx / size.width,
+        0,
+        1,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (_, __) {
       return GestureDetector(
-        onHorizontalDragUpdate: (details) {
-          final size = RenderHelper.getSize(globalKey: _key)!;
-          setState(
-            () => _fraction = NumHelper.bounded(
-              details.localPosition.dx / size.width,
-              0,
-              1,
-            ),
-          );
-        },
+        onTapUp: (details) => onPosition(details.localPosition),
+        onHorizontalDragUpdate: (details) => onPosition(details.localPosition),
         child: Stack(
           key: _key,
           children: [
