@@ -61,7 +61,11 @@ class RenderHelper {
       return null;
     }
 
-    final RenderObject? renderObject = globalKey.currentContext!.findRenderObject();
+    return getRectForContext(context: globalKey.currentContext!);
+  }
+
+  static Rect? getRectForContext({required BuildContext context}) {
+    final RenderObject? renderObject = context.findRenderObject();
     if (renderObject == null || !(renderObject is RenderBox)) {
       return null;
     }
