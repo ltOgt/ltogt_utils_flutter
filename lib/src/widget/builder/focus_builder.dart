@@ -7,11 +7,13 @@ class FocusBuilder extends StatefulWidget {
     required this.builder,
     this.focusNode,
     this.includeFocus = false,
+    this.onFocusChange,
   }) : super(key: key);
 
   final Widget Function(FocusNode focusNode) builder;
   final FocusNode? focusNode;
   final bool includeFocus;
+  final Function(bool hasFocus)? onFocusChange;
 
   @override
   State<FocusBuilder> createState() => _FocusBuilderState();
@@ -20,7 +22,10 @@ class FocusBuilder extends StatefulWidget {
 class _FocusBuilderState extends ComponentState<FocusBuilder> {
   late FocusNode focusNode;
 
-  void _update() => setState(() {});
+  void _update() {
+    widget.onFocusChange?.call(focusNode.hasFocus);
+    setState(() {});
+  }
 
   _init() {
     focusNode = widget.focusNode ?? FocusNode();
