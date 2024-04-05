@@ -6,9 +6,12 @@ class HoverBuilder extends StatefulWidget {
     this.builder,
     this.builderWithEvent,
     this.opaque = false,
+    this.onEnter,
+    this.onExit,
   })  : assert((builder == null) != (builderWithEvent == null)),
         super(key: key);
 
+  final VoidCallback? onEnter, onExit;
   final Widget Function(bool isHovering)? builder;
   final Widget Function(bool isHovering, PointerEvent? e)? builderWithEvent;
   final bool opaque;
@@ -40,6 +43,7 @@ class HoverBuilderState extends State<HoverBuilder> {
         opaque: widget.opaque,
         onEnter: (e) => setState(() {
           isHovering = true;
+          widget.onEnter?.call();
           _event = e;
         }),
         onHover: widget.builderWithEvent == null
@@ -51,6 +55,7 @@ class HoverBuilderState extends State<HoverBuilder> {
               },
         onExit: (e) => setState(() {
           isHovering = false;
+          widget.onExit?.call();
           _event = e;
         }),
         child: widget.builder?.call(isHovering) ?? widget.builderWithEvent?.call(isHovering, _event),
