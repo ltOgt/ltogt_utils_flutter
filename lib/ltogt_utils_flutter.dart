@@ -30,6 +30,7 @@ export 'src/widget/text/mulit_select_text.dart';
 export 'src/widget/text/text_span_gesture_detector.dart';
 
 export 'src/widget/size_helper.dart';
+export 'src/widget/measure_util.dart';
 
 export 'src/widget/file_tree_widget.dart';
 export 'src/widget/tree_widget.dart';
