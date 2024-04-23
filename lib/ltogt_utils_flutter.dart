@@ -54,6 +54,8 @@ export 'src/widget/positioned_maybe_animated.dart';
 
 export 'src/widget/clip_dragger.dart';
 
+export 'src/widget/key_aware_click.dart';
+
 export 'src/state/model/stateful_model.dart';
 export 'src/state/model/m_prop.dart';
 
