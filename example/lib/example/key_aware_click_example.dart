@@ -38,10 +38,17 @@ class MyWidget extends StatelessWidget {
           onTap: () => print("Hold F and click"),
           child: const Text("Hold F and click"),
         ),
-        KeyAwareClick(
+        KeyAwareClick.builder(
           logicalKey: LogicalKeyboardKey.space,
           onTap: () => print("Hold SPACE and click"),
-          child: const Text("Hold SPACE and click"),
+          builder: (_, clickable) => Text(
+            "Hold SPACE and click",
+            style: clickable
+                ? const TextStyle(
+                    decoration: TextDecoration.underline,
+                  )
+                : null,
+          ),
         ),
       ],
     );

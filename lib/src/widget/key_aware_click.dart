@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+typedef _Builder = Widget Function(BuildContext context, bool canTap);
+
 /// Only enables [onTap] if [logicalKey] is pressed.
 class KeyAwareClick extends StatefulWidget {
   const KeyAwareClick({
     required this.logicalKey,
     required this.onTap,
-    required this.child,
-  }) : super(key: null);
+    required Widget this.child,
+  })  : builder = null,
+        super(key: null);
+
+  const KeyAwareClick.builder({
+    required this.logicalKey,
+    required this.onTap,
+    required _Builder this.builder,
+  })  : child = null,
+        super(key: null);
 
   final VoidCallback onTap;
   final LogicalKeyboardKey logicalKey;
-  final Widget child;
+  final _Builder? builder;
+  final Widget? child;
 
   @override
   State<KeyAwareClick> createState() => _KeyAwareClickState();
@@ -102,7 +113,7 @@ class _KeyAwareClickState extends State<KeyAwareClick> {
       onExit: (_) => _unregister(),
       child: GestureDetector(
         onTap: _keyPressed ? widget.onTap : null,
-        child: widget.child,
+        child: widget.builder?.call(context, _keyListenerRegistered && _keyPressed) ?? widget.child,
       ),
     );
   }
