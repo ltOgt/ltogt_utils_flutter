@@ -82,7 +82,9 @@ class _KeyAwareClickState extends State<KeyAwareClick> {
 
   @override
   void dispose() {
-    _unregister();
+    if (_keyListenerRegistered) {
+      HardwareKeyboard.instance.removeHandler(handleKeyEvent);
+    }
     super.dispose();
   }
 
