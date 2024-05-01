@@ -111,21 +111,33 @@ class LinePath {
   /// Points from start to finish.
   final List<Offset> points;
 
-  /// Cached length of [points]
-  final int _length;
-
   late final Path path;
 
   LinePath({
     this.width = 1.0,
-    required this.points,
-  }) : _length = points.length {
+    required List<Offset> points,
+  }) : this.points = removeConsecutive(points).toList() {
+    if (this.points.length < 2) {
+      if (this.points.isEmpty) {
+        path = Path();
+        return;
+      }
+      path = Path()
+        ..addOval(
+          Rect.fromCircle(
+            center: this.points.first,
+            radius: width / 2,
+          ),
+        );
+      return;
+    }
+
     final List<Path> _linePaths = [];
 
     // Line segments as rects
-    for (int i = 0; i < _length - 1; i++) {
-      final p1 = points[i];
-      final p2 = points[i + 1];
+    for (int i = 0; i < this.points.length - 1; i++) {
+      final p1 = this.points[i];
+      final p2 = this.points[i + 1];
       _linePaths.add(_Helper.rectAroundVector(p1, p2, width / 2));
     }
     // for points
@@ -194,5 +206,18 @@ class _Helper {
       ..lineTo(p2_below.dx, p2_below.dy)
       ..lineTo(p1_below.dx, p1_below.dy)
       ..close();
+  }
+}
+
+Iterable<T> removeConsecutive<T>(List<T> input) sync* {
+  if (input.isEmpty) return;
+  T last = input.first;
+  yield input.first;
+  for (final element in input.skip(1)) {
+    if (element == last) {
+      continue;
+    }
+    last = element;
+    yield element;
   }
 }
