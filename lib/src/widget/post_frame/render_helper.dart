@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'dart:async';
 
 class RenderHelper {
+  RenderHelper._();
+
   /// Add a callback to be executed on the next frame.
   ///
   /// This can be useful if you need to call e.g. [RenderHelper.getSize]
@@ -129,7 +131,7 @@ class RenderHelper {
     return (rect: adjustedRect, screenSize: adjustedScreenSize);
   }
 
-  Rect? getRectRelativeToParent({required BuildContext parentContext, required BuildContext childContext}) {
+  static Rect? getRectRelativeToParent({required BuildContext parentContext, required BuildContext childContext}) {
     try {
       final roParent = parentContext.findRenderObject()! as RenderBox;
       final roChild = childContext.findRenderObject()! as RenderBox;
