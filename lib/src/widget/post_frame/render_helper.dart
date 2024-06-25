@@ -73,6 +73,15 @@ class RenderHelper {
     return renderObject.localToGlobal(Offset.zero) & renderObject.size;
   }
 
+  static Size? getSizeForContext({required BuildContext context}) {
+    final RenderObject? renderObject = context.findRenderObject();
+    if (renderObject == null || !(renderObject is RenderBox)) {
+      return null;
+    }
+
+    return renderObject.size;
+  }
+
   static RenderObject? getRenderObject({required GlobalKey globalKey}) {
     return globalKey.currentContext?.findRenderObject();
   }
@@ -118,5 +127,16 @@ class RenderHelper {
     );
 
     return (rect: adjustedRect, screenSize: adjustedScreenSize);
+  }
+
+  Rect? getRectRelativeToParent({required BuildContext parentContext, required BuildContext childContext}) {
+    try {
+      final roParent = parentContext.findRenderObject()! as RenderBox;
+      final roChild = childContext.findRenderObject()! as RenderBox;
+
+      return roParent.globalToLocal(roChild.localToGlobal(Offset.zero)) & roChild.size;
+    } catch (_) {
+      return null;
+    }
   }
 }
