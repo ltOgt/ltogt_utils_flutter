@@ -8,6 +8,7 @@ class HoverBuilder extends StatefulWidget {
     this.opaque = false,
     this.onEnter,
     this.onExit,
+    this.cursor = MouseCursor.defer,
   })  : assert((builder == null) != (builderWithEvent == null)),
         super(key: key);
 
@@ -15,6 +16,7 @@ class HoverBuilder extends StatefulWidget {
   final Widget Function(bool isHovering)? builder;
   final Widget Function(bool isHovering, PointerEvent? e)? builderWithEvent;
   final bool opaque;
+  final MouseCursor cursor;
 
   @override
   State<HoverBuilder> createState() => HoverBuilderState();
@@ -40,6 +42,7 @@ class HoverBuilderState extends State<HoverBuilder> {
         _event = e;
       }),
       child: MouseRegion(
+        cursor: widget.cursor,
         opaque: widget.opaque,
         onEnter: (e) => setState(() {
           isHovering = true;
