@@ -5,12 +5,12 @@ import 'package:flutter/widgets.dart';
 /// Does not rebuild on changed parameters, use [key]
 class DisposableBuilder<T> extends StatefulWidget {
   const DisposableBuilder({
-    required ValueKey key,
+    super.key,
     required this.init,
     required this.dispose,
     required this.builder,
     this.listen = false,
-  }) : super(key: key);
+  });
 
   final Widget Function(T disposable) builder;
   final T Function() init;
@@ -18,7 +18,7 @@ class DisposableBuilder<T> extends StatefulWidget {
   final bool listen;
 
   @override
-  State<DisposableBuilder> createState() => _DisposableBuilderState();
+  State<DisposableBuilder<T>> createState() => _DisposableBuilderState<T>();
 }
 
 class _DisposableBuilderState<T> extends State<DisposableBuilder<T>> {
